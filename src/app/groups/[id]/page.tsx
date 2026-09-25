@@ -24,13 +24,17 @@ export default async function GroupPage({
 
   if (error || !group) redirect("/dashboard");
 
-  // Get initial messages
+  // Get initial messages (most recent 50, ascending so chat reads top→bottom)
   const { data: messages } = await supabase
     .from("messages")
     .select("*, profiles(full_name)")
     .eq("group_id", id)
-    .order("created_at", { ascending: true })
-    .limit(50);
+    .order("created_at", { ascending: false })
+    .limit(50)
+    .then(({ data, error }) => ({
+      data: data ? [...data].reverse() : [],
+      error,
+    }));
 
   // Get initial resources
   const { data: resources } = await supabase

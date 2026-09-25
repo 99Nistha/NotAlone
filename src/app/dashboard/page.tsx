@@ -38,6 +38,23 @@ export default async function DashboardPage() {
     description: string | null;
   }>;
 
+  // Get last message per group for preview
+  const lastMessagesByGroup: Record<string, { content: string; created_at: string }> = {};
+  if (groupIds.length) {
+    const { data: recentMessages } = await supabase
+      .from("messages")
+      .select("group_id, content, created_at")
+      .in("group_id", groupIds)
+      .order("created_at", { ascending: false })
+      .limit(groupIds.length * 5); // fetch a few per group
+
+    recentMessages?.forEach((msg) => {
+      if (!lastMessagesByGroup[msg.group_id]) {
+        lastMessagesByGroup[msg.group_id] = { content: msg.content, created_at: msg.created_at };
+      }
+    });
+  }
+
   // Get user's children
   const { data: children } = await supabase
     .from("children")
@@ -144,22 +161,34 @@ export default async function DashboardPage() {
                   href={`/groups/${group.id}`}
                   className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group"
                 >
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">
                       {group.condition_name}
                     </div>
-                    <ArrowRight className="text-gray-400 group-hover:text-blue-600 transition-colors" size={18} />
+                    <ArrowRight className="text-gray-400 group-hover:text-blue-600 transition-colors flex-shrink-0 ml-2" size={18} />
                   </div>
-                  {group.description && (
-                    <p className="text-sm text-gray-500 mb-3">{group.description}</p>
+
+                  {/* Last message preview */}
+                  {lastMessagesByGroup[group.id] ? (
+                    <p className="text-sm text-gray-500 mb-3 line-clamp-2">
+                      &ldquo;{lastMessagesByGroup[group.id].content}&rdquo;
+                    </p>
+                  ) : (
+                    <p className="text-sm text-gray-400 italic mb-3">
+                      No messages yet — be the first to say hello!
+                    </p>
                   )}
+
                   <div className="flex gap-4 text-sm text-gray-400">
                     <span className="flex items-center gap-1">
-                      <Users size={13} /> {group.member_count} members
+                      <Users size={13} /> {group.member_count} {group.member_count === 1 ? "member" : "members"}
                     </span>
-                    <span className="flex items-center gap-1">
-                      <MessageCircle size={13} /> Open chat
-                    </span>
+                    {lastMessagesByGroup[group.id] && (
+                      <span className="flex items-center gap-1 ml-auto text-xs">
+                        <MessageCircle size={12} />
+                        {new Date(lastMessagesByGroup[group.id].created_at).toLocaleDateString([], { month: "short", day: "numeric" })}
+                      </span>
+                    )}
                   </div>
                 </Link>
               ))}

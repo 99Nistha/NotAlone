@@ -35,8 +35,9 @@ export async function POST(request: NextRequest) {
       .limit(1);
 
     let group = existingGroups?.[0];
+    const isNewGroup = !group;
 
-    if (!group) {
+    if (isNewGroup) {
       const { data: newGroup, error: groupError } = await supabase
         .from("groups")
         .insert({ condition_name: conditionName })
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
         .eq("parent_id", user.id);
     }
 
-    return NextResponse.json({ conditionName, group });
+    return NextResponse.json({ conditionName, group, isNewGroup });
   } catch (err) {
     console.error("match-condition error:", err);
     return NextResponse.json(
