@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Heart, MessageCircle, Users, ArrowRight, PlusCircle } from "lucide-react";
+import SignOutButton from "@/components/SignOutButton";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -78,11 +79,7 @@ export default async function DashboardPage() {
             <span className="text-sm text-gray-500 hidden sm:block">
               {profile?.full_name || user.email}
             </span>
-            <form action="/api/auth/signout" method="POST">
-              <button className="text-sm text-gray-500 hover:text-gray-900">
-                Sign out
-              </button>
-            </form>
+            <SignOutButton />
           </div>
         </div>
       </nav>
