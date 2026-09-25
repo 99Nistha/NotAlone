@@ -22,10 +22,21 @@ export default async function DashboardPage() {
   // Get user's groups via group_members
   const { data: memberships } = await supabase
     .from("group_members")
-    .select("group_id, groups(*)")
+    .select("group_id")
     .eq("user_id", user.id);
 
-  const groups = memberships?.map((m) => m.groups).filter(Boolean) ?? [];
+  const groupIds = memberships?.map((m) => m.group_id) ?? [];
+
+  const { data: groupsData } = groupIds.length
+    ? await supabase.from("groups").select("*").in("id", groupIds)
+    : { data: [] };
+
+  const groups = (groupsData ?? []) as Array<{
+    id: string;
+    condition_name: string;
+    member_count: number;
+    description: string | null;
+  }>;
 
   // Get user's children
   const { data: children } = await supabase
@@ -127,7 +138,7 @@ export default async function DashboardPage() {
           <div>
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Your groups</h2>
             <div className="grid sm:grid-cols-2 gap-4">
-              {(groups as Array<{ id: string; condition_name: string; member_count: number; description: string | null }>).map((group) => (
+              {groups.map((group) => (
                 <Link
                   key={group.id}
                   href={`/groups/${group.id}`}

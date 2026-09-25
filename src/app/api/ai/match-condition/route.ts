@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { normalizeCondition } from "@/lib/anthropic";
+import { normalizeCondition } from "@/lib/conditionMatcher";
 import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
@@ -24,8 +24,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Normalize condition using Claude
-    const conditionName = await normalizeCondition(description);
+    // Normalize condition using keyword matcher (no API cost)
+    const conditionName = normalizeCondition(description);
 
     // Find existing group or create new one
     const { data: existingGroups } = await supabase
