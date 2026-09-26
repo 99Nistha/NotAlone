@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { Heart, ArrowLeft, Mic, MicOff, Save } from "lucide-react";
+import { Heart, ArrowLeft, Mic, MicOff, Save, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 export default function EditChildPage() {
@@ -18,6 +18,7 @@ export default function EditChildPage() {
   const [originalCondition, setOriginalCondition] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
@@ -116,6 +117,14 @@ export default function EditChildPage() {
     recognitionRef.current?.stop();
     setForm((f) => ({ ...f, condition_description: liveTranscriptRef.current }));
     setIsRecording(false);
+  }
+
+  async function handleDelete() {
+    if (!confirm(`Remove ${form.name}'s profile? This will also remove them from their support group.`)) return;
+    setDeleting(true);
+    await fetch(`/api/children/${id}`, { method: "DELETE" });
+    router.push("/dashboard");
+    router.refresh();
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -281,6 +290,18 @@ export default function EditChildPage() {
               >
                 <Save size={15} />
                 {saving ? "Saving…" : "Save changes"}
+              </button>
+            </div>
+
+            <div className="pt-4 border-t border-gray-100 mt-2">
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="w-full flex items-center justify-center gap-2 text-sm text-red-500 hover:text-red-700 hover:bg-red-50 py-2.5 rounded-lg transition-colors disabled:opacity-50"
+              >
+                <Trash2 size={14} />
+                {deleting ? "Removing…" : `Remove ${form.name}'s profile`}
               </button>
             </div>
           </form>

@@ -71,3 +71,28 @@ export async function PATCH(
 
   return NextResponse.json({ child: data });
 }
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  const supabase = await createClient();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  // Remove group memberships tied to this child first
+  await supabase.from("group_members").delete().eq("child_id", id).eq("user_id", user.id);
+
+  // Delete the child record (only if owned by this user)
+  const { error } = await supabase
+    .from("children")
+    .delete()
+    .eq("id", id)
+    .eq("parent_id", user.id);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  return NextResponse.json({ success: true });
+}

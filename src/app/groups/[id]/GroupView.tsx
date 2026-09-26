@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
   Heart,
@@ -12,6 +13,7 @@ import {
   PlusCircle,
   ExternalLink,
   ChevronUp,
+  LogOut,
 } from "lucide-react";
 import type { Group, Message, Resource } from "@/types";
 
@@ -34,8 +36,10 @@ export default function GroupView({
   userId,
   userFullName,
 }: GroupViewProps) {
+  const router = useRouter();
   const [tab, setTab] = useState<Tab>("chat");
   const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [leavingGroup, setLeavingGroup] = useState(false);
   const [resources, setResources] = useState<Resource[]>(initialResources);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
@@ -166,6 +170,14 @@ export default function GroupView({
     setSending(false);
   }
 
+  async function leaveGroup() {
+    if (!confirm(`Leave the ${group.condition_name} group? You can rejoin later by re-adding a child with this condition.`)) return;
+    setLeavingGroup(true);
+    await fetch(`/api/groups/${group.id}/leave`, { method: "DELETE" });
+    router.push("/dashboard");
+    router.refresh();
+  }
+
   async function addResource(e: React.FormEvent) {
     e.preventDefault();
     if (!resourceForm.title.trim() || addingResource) return;
@@ -223,10 +235,20 @@ export default function GroupView({
               <div className="text-xs text-gray-400">{group.member_count} {group.member_count === 1 ? "member" : "members"}</div>
             </div>
           </div>
-          <Link href="/dashboard" className="flex items-center gap-1.5">
-            <Heart className="text-blue-600" size={18} fill="currentColor" />
-            <span className="text-sm font-bold text-gray-900 hidden sm:block">Not Alone</span>
-          </Link>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={leaveGroup}
+              disabled={leavingGroup}
+              title="Leave group"
+              className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50"
+            >
+              <LogOut size={18} />
+            </button>
+            <Link href="/dashboard" className="flex items-center gap-1.5">
+              <Heart className="text-blue-600" size={18} fill="currentColor" />
+              <span className="text-sm font-bold text-gray-900 hidden sm:block">Not Alone</span>
+            </Link>
+          </div>
         </div>
       </nav>
 
