@@ -32,7 +32,23 @@ export default async function DashboardPage() {
     ? await supabase.from("groups").select("*").in("id", groupIds)
     : { data: [] };
 
-  const groups = (groupsData ?? []) as Array<{
+  // Count members live — don't trust the denormalized member_count column
+  const { data: memberCounts } = groupIds.length
+    ? await supabase
+        .from("group_members")
+        .select("group_id")
+        .in("group_id", groupIds)
+    : { data: [] };
+
+  const memberCountMap: Record<string, number> = {};
+  memberCounts?.forEach(({ group_id }) => {
+    memberCountMap[group_id] = (memberCountMap[group_id] ?? 0) + 1;
+  });
+
+  const groups = (groupsData ?? []).map((g) => ({
+    ...g,
+    member_count: memberCountMap[g.id] ?? 0,
+  })) as Array<{
     id: string;
     condition_name: string;
     member_count: number;
