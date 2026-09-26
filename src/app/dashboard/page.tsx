@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { Heart, MessageCircle, Users, ArrowRight, PlusCircle, Pencil } from "lucide-react";
+import { Heart, MessageCircle, Users, ArrowRight, PlusCircle, Pencil, Settings } from "lucide-react";
 import SignOutButton from "@/components/SignOutButton";
 
 export default async function DashboardPage() {
@@ -75,10 +75,13 @@ export default async function DashboardPage() {
             <Heart className="text-blue-600" size={22} fill="currentColor" />
             <span className="text-lg font-bold text-gray-900">Not Alone</span>
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <span className="text-sm text-gray-500 hidden sm:block">
               {profile?.full_name || user.email}
             </span>
+            <Link href="/settings" className="text-gray-400 hover:text-gray-700 transition-colors" title="Account settings">
+              <Settings size={18} />
+            </Link>
             <SignOutButton />
           </div>
         </div>
