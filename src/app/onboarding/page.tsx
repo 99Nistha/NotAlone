@@ -35,6 +35,7 @@ export default function OnboardingPage() {
   const [audioSupported, setAudioSupported] = useState(true);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const liveTranscriptRef = useRef("");
+  const stoppedManuallyRef = useRef(false);
 
   // Document upload state
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -87,34 +88,57 @@ export default function OnboardingPage() {
       return;
     }
 
-    const recognition = new SpeechRecognitionAPI();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = "en-US";
-
+    stoppedManuallyRef.current = false;
     liveTranscriptRef.current = description;
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      let interim = "";
-      let final = "";
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const t = event.results[i][0].transcript;
-        if (event.results[i].isFinal) final += t + " ";
-        else interim += t;
-      }
-      if (final) liveTranscriptRef.current += final;
-      setDescription(liveTranscriptRef.current + interim);
-    };
+    function createRecognition() {
+      const recognition = new SpeechRecognitionAPI!();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
 
-    recognition.onerror = () => setIsRecording(false);
-    recognition.onend = () => setIsRecording(false);
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        let interim = "";
+        let final = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const t = event.results[i][0].transcript;
+          if (event.results[i].isFinal) final += t + " ";
+          else interim += t;
+        }
+        if (final) liveTranscriptRef.current += final;
+        setDescription(liveTranscriptRef.current + interim);
+      };
 
+      recognition.onerror = (event: Event & { error?: string }) => {
+        if (event.error === "not-allowed") {
+          stoppedManuallyRef.current = true;
+          setAudioSupported(false);
+          setIsRecording(false);
+        }
+      };
+
+      // Chrome stops recognition after silence — restart automatically
+      recognition.onend = () => {
+        if (!stoppedManuallyRef.current) {
+          const next = createRecognition();
+          next.start();
+          recognitionRef.current = next;
+        } else {
+          setIsRecording(false);
+        }
+      };
+
+      return recognition;
+    }
+
+    const recognition = createRecognition();
     recognition.start();
     recognitionRef.current = recognition;
     setIsRecording(true);
   }
 
   function stopRecording() {
+    stoppedManuallyRef.current = true;
     recognitionRef.current?.stop();
     setDescription(liveTranscriptRef.current);
     setIsRecording(false);

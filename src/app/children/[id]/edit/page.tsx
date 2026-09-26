@@ -23,8 +23,10 @@ export default function EditChildPage() {
 
   // Audio
   const [isRecording, setIsRecording] = useState(false);
+  const [audioSupported, setAudioSupported] = useState(true);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const liveTranscriptRef = useRef("");
+  const stoppedManuallyRef = useRef(false);
 
   useEffect(() => {
     async function load() {
@@ -55,34 +57,62 @@ export default function EditChildPage() {
       (window as typeof window & { webkitSpeechRecognition?: typeof SpeechRecognition })
         .webkitSpeechRecognition;
 
-    if (!SpeechRecognitionAPI) return;
+    if (!SpeechRecognitionAPI) {
+      setAudioSupported(false);
+      return;
+    }
 
-    const recognition = new SpeechRecognitionAPI();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = "en-US";
+    stoppedManuallyRef.current = false;
     liveTranscriptRef.current = form.condition_description;
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      let interim = "";
-      let final = "";
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const t = event.results[i][0].transcript;
-        if (event.results[i].isFinal) final += t + " ";
-        else interim += t;
-      }
-      if (final) liveTranscriptRef.current += final;
-      setForm((f) => ({ ...f, condition_description: liveTranscriptRef.current + interim }));
-    };
+    function createRecognition() {
+      const recognition = new SpeechRecognitionAPI!();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
 
-    recognition.onerror = () => setIsRecording(false);
-    recognition.onend = () => setIsRecording(false);
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        let interim = "";
+        let final = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const t = event.results[i][0].transcript;
+          if (event.results[i].isFinal) final += t + " ";
+          else interim += t;
+        }
+        if (final) liveTranscriptRef.current += final;
+        setForm((f) => ({ ...f, condition_description: liveTranscriptRef.current + interim }));
+      };
+
+      recognition.onerror = (event: Event & { error?: string }) => {
+        if (event.error === "not-allowed") {
+          stoppedManuallyRef.current = true;
+          setAudioSupported(false);
+          setIsRecording(false);
+        }
+      };
+
+      // Chrome stops recognition after silence — restart automatically
+      recognition.onend = () => {
+        if (!stoppedManuallyRef.current) {
+          const next = createRecognition();
+          next.start();
+          recognitionRef.current = next;
+        } else {
+          setIsRecording(false);
+        }
+      };
+
+      return recognition;
+    }
+
+    const recognition = createRecognition();
     recognition.start();
     recognitionRef.current = recognition;
     setIsRecording(true);
   }
 
   function stopRecording() {
+    stoppedManuallyRef.current = true;
     recognitionRef.current?.stop();
     setForm((f) => ({ ...f, condition_description: liveTranscriptRef.current }));
     setIsRecording(false);
@@ -147,6 +177,12 @@ export default function EditChildPage() {
               <p className="text-sm text-gray-500">Update {form.name}&apos;s details</p>
             </div>
           </div>
+
+          {!audioSupported && (
+            <div className="bg-yellow-50 text-yellow-800 text-sm px-4 py-3 rounded-lg mb-5">
+              Speech recognition isn&apos;t supported in this browser. Use Chrome or Edge, or type below.
+            </div>
+          )}
 
           {error && (
             <div className="bg-red-50 text-red-700 text-sm px-4 py-3 rounded-lg mb-5">
@@ -226,7 +262,7 @@ export default function EditChildPage() {
               {isRecording && (
                 <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
-                  Recording…
+                  Recording… speak clearly. Click mic to stop.
                 </p>
               )}
             </div>
