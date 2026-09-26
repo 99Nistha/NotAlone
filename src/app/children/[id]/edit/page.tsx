@@ -16,6 +16,7 @@ export default function EditChildPage() {
     condition_description: "",
   });
   const [originalCondition, setOriginalCondition] = useState("");
+  const [hasGroup, setHasGroup] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -45,6 +46,7 @@ export default function EditChildPage() {
           condition_description: data.condition_description ?? "",
         });
         setOriginalCondition(data.condition_description ?? "");
+        setHasGroup(!!data.condition_normalized);
       }
       setLoading(false);
     }
@@ -134,6 +136,8 @@ export default function EditChildPage() {
     setError("");
 
     const conditionChanged = form.condition_description !== originalCondition;
+    // Also re-match if the parent has no current group (e.g. they left)
+    const shouldRematch = conditionChanged || !hasGroup;
 
     const res = await fetch(`/api/children/${id}`, {
       method: "PATCH",
@@ -141,7 +145,9 @@ export default function EditChildPage() {
       body: JSON.stringify({
         name: form.name,
         age: form.age,
-        ...(conditionChanged && { condition_description: form.condition_description }),
+        ...(shouldRematch && form.condition_description.trim() && {
+          condition_description: form.condition_description,
+        }),
       }),
     });
 

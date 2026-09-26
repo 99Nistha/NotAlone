@@ -34,9 +34,10 @@ export async function PATCH(
         .eq("condition_name", conditionName)
         .limit(1);
 
+      const isNewGroup = !existing?.[0];
       let groupId: string;
-      if (existing?.[0]) {
-        groupId = existing[0].id;
+      if (!isNewGroup) {
+        groupId = existing![0].id;
       } else {
         const { data: newGroup } = await supabase
           .from("groups")
@@ -53,9 +54,18 @@ export async function PATCH(
         .eq("user_id", user.id)
         .eq("child_id", id);
 
-      await supabase
+      const { error: joinError } = await supabase
         .from("group_members")
         .upsert({ user_id: user.id, group_id: groupId, child_id: id });
+
+      // Notify the group when re-joining an existing group
+      if (!joinError && !isNewGroup) {
+        await supabase.from("messages").insert({
+          group_id: groupId,
+          user_id: user.id,
+          content: "[[joined]]",
+        });
+      }
     }
   }
 
