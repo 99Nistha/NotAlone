@@ -22,6 +22,21 @@ const CONDITIONS: ConditionRule[] = [
   { name: "Rett Syndrome", keywords: ["rett"] },
   { name: "Cri du Chat Syndrome", keywords: ["cri du chat", "5p minus"] },
 
+  // Speech, Language & Communication
+  { name: "Childhood Apraxia of Speech (CAS)", keywords: ["apraxia of speech", "childhood apraxia", "cas ", "motor speech", "apraxia"] },
+  { name: "Childhood-Onset Fluency Disorder (Stuttering)", keywords: ["stutter", "stuttering", "stammer", "stammering", "fluency disorder", "dysfluency"] },
+  { name: "Developmental Language Disorder (DLD)", keywords: ["developmental language disorder", "dld", "language disorder", "language impairment", "receptive language", "expressive language", "language processing disorder"] },
+  { name: "Speech Sound Disorder (Phonological Disorder)", keywords: ["phonological disorder", "articulation disorder", "speech sound disorder", "phonological", "articulation problem", "articulation delay", "speech articulation"] },
+  { name: "Selective Mutism", keywords: ["selective mutism", "won't speak", "refuses to speak", "won't talk", "refuses to talk"] },
+  { name: "Dysarthria", keywords: ["dysarthria"] },
+  { name: "Speech & Language Delay", keywords: [
+    "speech disorder", "speech delay", "speech problem", "speech difficulty",
+    "language delay", "language problem", "slow to talk", "late talker",
+    "not talking", "can't talk", "cannot talk", "doesn't speak", "not speaking",
+    "speech therapy", "speech therapist", "speech pathologist",
+    "communication disorder", "communication delay", "verbal delay",
+  ]},
+
   // Neurodevelopmental
   { name: "Autism Spectrum Disorder", keywords: ["autism", "autistic", "asd", "asperger", "nonverbal autism", "non-verbal autism", "on the spectrum"] },
   { name: "ADHD", keywords: ["adhd", "attention deficit", "hyperactive", "hyperactivity", "attention disorder"] },
