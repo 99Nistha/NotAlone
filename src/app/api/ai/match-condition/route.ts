@@ -27,11 +27,11 @@ export async function POST(request: NextRequest) {
     // Normalize condition using keyword matcher (no API cost)
     const conditionName = normalizeCondition(description);
 
-    // Find existing group or create new one
+    // Find existing group or create new one (exact match on normalized name)
     const { data: existingGroups } = await supabase
       .from("groups")
       .select("*")
-      .ilike("condition_name", `%${conditionName.split(" ")[0]}%`)
+      .eq("condition_name", conditionName)
       .limit(1);
 
     let group = existingGroups?.[0];

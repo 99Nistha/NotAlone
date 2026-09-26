@@ -27,11 +27,11 @@ export async function PATCH(
       const conditionName = normalizeCondition(condition_description);
       updates.condition_normalized = conditionName;
 
-      // Find or create group
+      // Find or create group (exact match on normalized name)
       const { data: existing } = await supabase
         .from("groups")
         .select("id")
-        .ilike("condition_name", `%${conditionName.split(" ")[0]}%`)
+        .eq("condition_name", conditionName)
         .limit(1);
 
       let groupId: string;

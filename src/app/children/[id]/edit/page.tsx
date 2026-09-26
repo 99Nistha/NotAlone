@@ -156,7 +156,10 @@ export default function EditChildPage() {
     setSuccess(true);
     setSaving(false);
 
-    setTimeout(() => router.push("/dashboard"), 1200);
+    setTimeout(() => {
+      router.push("/dashboard");
+      router.refresh();
+    }, 1200);
   }
 
   if (loading) {
