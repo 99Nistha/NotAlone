@@ -99,11 +99,13 @@ CREATE POLICY "Authenticated users can read groups"
 CREATE POLICY "Authenticated users can create groups"
   ON groups FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
--- Group members: read own, join any
+-- Group members: read own, join any, leave own
 CREATE POLICY "Users see own memberships"
   ON group_members FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can join groups"
   ON group_members FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can leave groups"
+  ON group_members FOR DELETE USING (auth.uid() = user_id);
 
 -- Messages: members of the group can read/write
 CREATE POLICY "Group members can read messages"
@@ -180,4 +182,3 @@ CREATE TRIGGER on_group_join
 
 -- Enable Realtime for messages table
 ALTER PUBLICATION supabase_realtime ADD TABLE messages;
-KE 
