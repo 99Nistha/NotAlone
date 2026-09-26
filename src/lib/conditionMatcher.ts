@@ -11,7 +11,7 @@ interface ConditionRule {
 
 const CONDITIONS: ConditionRule[] = [
   // Chromosomal / genetic
-  { name: "Down Syndrome", keywords: ["down syndrome", "down's syndrome", "trisomy 21", "down's", "downs"] },
+  { name: "Down Syndrome (Trisomy 21)", keywords: ["down syndrome", "down's syndrome", "trisomy 21", "down's", "downs"] },
   { name: "Fragile X Syndrome", keywords: ["fragile x", "fragilex", "fxs"] },
   { name: "Turner Syndrome", keywords: ["turner syndrome", "turner", "monosomy x"] },
   { name: "Klinefelter Syndrome", keywords: ["klinefelter", "xxy"] },
