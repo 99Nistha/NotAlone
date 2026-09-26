@@ -33,17 +33,17 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-[#faf9ff] flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-md">
         <Link href="/" className="flex items-center justify-center gap-2 mb-8">
-          <Heart className="text-blue-600" size={28} fill="currentColor" />
+          <Heart className="text-rose-500" size={28} fill="currentColor" />
           <span className="text-2xl font-bold text-gray-900">Not Alone</span>
         </Link>
 
         {sent ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-            <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Heart className="text-blue-600" size={26} fill="currentColor" />
+          <div className="bg-white rounded-2xl shadow-sm border border-violet-100/60 p-8 text-center">
+            <div className="w-14 h-14 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Heart className="text-rose-500" size={26} fill="currentColor" />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Check your email</h1>
             <p className="text-gray-500 mb-1">We sent a password reset link to</p>
@@ -55,13 +55,13 @@ export default function ForgotPasswordPage() {
             </p>
             <Link
               href="/login"
-              className="text-sm text-blue-600 hover:underline flex items-center justify-center gap-1"
+              className="text-sm text-violet-600 hover:underline flex items-center justify-center gap-1"
             >
               <ArrowLeft size={14} /> Back to login
             </Link>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-violet-100/60 p-8">
             <Link
               href="/login"
               className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-700 mb-6"
@@ -75,7 +75,7 @@ export default function ForgotPasswordPage() {
             </p>
 
             {error && (
-              <div className="bg-red-50 text-red-700 text-sm px-4 py-3 rounded-lg mb-5">
+              <div className="bg-red-50 text-red-700 text-sm px-4 py-3 rounded-xl mb-5">
                 {error}
               </div>
             )}
@@ -91,13 +91,13 @@ export default function ForgotPasswordPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="jane@example.com"
-                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                 />
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 rounded-lg transition-colors"
+                className="w-full bg-violet-600 hover:bg-violet-700 disabled:bg-violet-400 text-white font-semibold py-3 rounded-xl transition-colors"
               >
                 {loading ? "Sending…" : "Send reset link"}
               </button>

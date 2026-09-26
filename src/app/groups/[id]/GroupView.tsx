@@ -53,6 +53,16 @@ export default function GroupView({
   );
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const profilesMapRef = useRef<Record<string, string>>({});
+
+  // Build profiles cache from initial messages (once)
+  useEffect(() => {
+    initialMessages.forEach((msg) => {
+      const name = (msg.profiles as { full_name?: string })?.full_name;
+      if (name && msg.user_id) profilesMapRef.current[msg.user_id] = name;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Realtime subscription
   useEffect(() => {
@@ -70,23 +80,32 @@ export default function GroupView({
         },
         (payload) => {
           const newMsg = payload.new as Message;
-          setMessages((prev) => {
-            if (prev.some((m) => m.id === newMsg.id)) return prev;
-            return [
-              ...prev,
-              {
-                ...newMsg,
-                profiles: {
-                  id: newMsg.user_id,
-                  full_name:
-                    newMsg.user_id === userId ? userFullName : "Member",
-                  location: null,
-                  created_at: "",
-                  updated_at: "",
-                },
-              },
-            ];
-          });
+          const senderId = newMsg.user_id;
+
+          if (senderId === userId) {
+            setMessages((prev) => {
+              if (prev.some((m) => m.id === newMsg.id)) return prev;
+              return [...prev, { ...newMsg, profiles: { id: senderId, full_name: userFullName, location: null, created_at: "", updated_at: "" } }];
+            });
+            return;
+          }
+
+          const cachedName = profilesMapRef.current[senderId];
+          if (cachedName) {
+            setMessages((prev) => {
+              if (prev.some((m) => m.id === newMsg.id)) return prev;
+              return [...prev, { ...newMsg, profiles: { id: senderId, full_name: cachedName, location: null, created_at: "", updated_at: "" } }];
+            });
+          } else {
+            supabase.from("profiles").select("full_name").eq("id", senderId).single().then(({ data }) => {
+              const name = data?.full_name ?? "Member";
+              profilesMapRef.current[senderId] = name;
+              setMessages((prev) => {
+                if (prev.some((m) => m.id === newMsg.id)) return prev;
+                return [...prev, { ...newMsg, profiles: { id: senderId, full_name: name, location: null, created_at: "", updated_at: "" } }];
+              });
+            });
+          }
         }
       )
       .subscribe();
@@ -130,6 +149,10 @@ export default function GroupView({
 
     if (data && data.length > 0) {
       const older = [...data].reverse() as Message[];
+      older.forEach((msg) => {
+        const name = (msg.profiles as { full_name?: string })?.full_name;
+        if (name && msg.user_id) profilesMapRef.current[msg.user_id] = name;
+      });
       setMessages((prev) => [...older, ...prev]);
       setHasEarlierMessages(data.length >= PAGE_SIZE);
 
@@ -174,7 +197,14 @@ export default function GroupView({
   async function leaveGroup() {
     if (!confirm(`Leave the ${group.condition_name} group? You can rejoin later by re-adding a child with this condition.`)) return;
     setLeavingGroup(true);
-    await fetch(`/api/groups/${group.id}/leave`, { method: "DELETE" });
+    const res = await fetch(`/api/groups/${group.id}/leave`, { method: "DELETE" });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      alert(`Could not leave group: ${body.error ?? res.statusText}`);
+      setLeavingGroup(false);
+      return;
+    }
+    // Full page reload so the dashboard fetches fresh data from the server
     window.location.href = "/dashboard";
   }
 
@@ -200,7 +230,7 @@ export default function GroupView({
   }
 
   function formatTime(ts: string) {
-    return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return new Date(ts).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
   }
 
   function formatDate(ts: string) {
@@ -245,7 +275,7 @@ export default function GroupView({
               <LogOut size={18} />
             </button>
             <Link href="/" className="flex items-center gap-1.5">
-              <Heart className="text-blue-600" size={18} fill="currentColor" />
+              <Heart className="text-rose-500" size={18} fill="currentColor" />
               <span className="text-sm font-bold text-gray-900 hidden sm:block">Not Alone</span>
             </Link>
           </div>
@@ -261,7 +291,7 @@ export default function GroupView({
               onClick={() => setTab(t)}
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                 tab === t
-                  ? "border-blue-600 text-blue-600"
+                  ? "border-violet-600 text-violet-600"
                   : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
@@ -286,7 +316,7 @@ export default function GroupView({
                 <button
                   onClick={loadEarlierMessages}
                   disabled={loadingEarlier}
-                  className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-full transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 text-sm text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 px-4 py-2 rounded-full transition-colors disabled:opacity-50"
                 >
                   <ChevronUp size={15} />
                   {loadingEarlier ? "Loading…" : "Load earlier messages"}
@@ -307,6 +337,10 @@ export default function GroupView({
               const showDateSep =
                 !prevMsg ||
                 getDateLabel(msg.created_at) !== getDateLabel(prevMsg.created_at);
+              const isSystem = msg.content === "[[joined]]" || msg.content === "[[left]]";
+              const senderName = isOwn
+                ? "You"
+                : (msg.profiles as { full_name?: string })?.full_name || "Someone";
 
               return (
                 <div key={msg.id}>
@@ -321,32 +355,47 @@ export default function GroupView({
                     </div>
                   )}
 
-                  <div className={`flex flex-col mb-2 ${isOwn ? "items-end" : "items-start"}`}>
-                    <div className="text-xs text-gray-400 mb-1 px-1">
-                      {isOwn ? (
-                        <>You · {formatTime(msg.created_at)}</>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => setSenderPopover({ userId: msg.user_id, name: (msg.profiles as { full_name?: string })?.full_name || "Member" })}
-                            className="hover:text-blue-600 hover:underline transition-colors"
-                          >
-                            {(msg.profiles as { full_name?: string })?.full_name || "Member"}
-                          </button>
-                          {" · "}{formatTime(msg.created_at)}
-                        </>
-                      )}
+                  {/* System event pill */}
+                  {isSystem ? (
+                    <div className="flex items-center gap-3 my-3 px-2">
+                      <div className="flex-1 h-px bg-gray-100" />
+                      <span className={`text-xs font-medium px-3 py-1 rounded-full ${
+                        msg.content === "[[joined]]"
+                          ? "bg-violet-50 text-violet-600"
+                          : "bg-gray-100 text-gray-500"
+                      }`}>
+                        {senderName} {msg.content === "[[joined]]" ? "joined" : "left"} · {formatTime(msg.created_at)}
+                      </span>
+                      <div className="flex-1 h-px bg-gray-100" />
                     </div>
-                    <div
-                      className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                        isOwn
-                          ? "bg-blue-600 text-white rounded-tr-sm"
-                          : "bg-white border border-gray-100 text-gray-900 rounded-tl-sm shadow-sm"
-                      }`}
-                    >
-                      {msg.content}
+                  ) : (
+                    <div className={`flex flex-col mb-2 ${isOwn ? "items-end" : "items-start"}`}>
+                      <div className="text-xs text-gray-400 mb-1 px-1">
+                        {isOwn ? (
+                          <>You · {formatTime(msg.created_at)}</>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => setSenderPopover({ userId: msg.user_id, name: (msg.profiles as { full_name?: string })?.full_name || "Member" })}
+                              className="hover:text-violet-600 hover:underline transition-colors"
+                            >
+                              {(msg.profiles as { full_name?: string })?.full_name || "Member"}
+                            </button>
+                            {" · "}{formatTime(msg.created_at)}
+                          </>
+                        )}
+                      </div>
+                      <div
+                        className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                          isOwn
+                            ? "bg-violet-600 text-white rounded-tr-sm"
+                            : "bg-white border border-gray-100 text-gray-900 rounded-tl-sm shadow-sm"
+                        }`}
+                      >
+                        {msg.content}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               );
             })}
@@ -362,12 +411,12 @@ export default function GroupView({
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 placeholder="Type a message…"
-                className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
               />
               <button
                 type="submit"
                 disabled={sending || !newMessage.trim()}
-                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white px-4 py-2.5 rounded-xl transition-colors"
+                className="bg-violet-600 hover:bg-violet-700 disabled:bg-violet-300 text-white px-4 py-2.5 rounded-xl transition-colors"
               >
                 <Send size={18} />
               </button>
@@ -390,7 +439,7 @@ export default function GroupView({
             <div className="text-xs text-gray-400 mb-4">Member of this group</div>
             <Link
               href={`/messages/${senderPopover.userId}`}
-              className="flex items-center gap-2 w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors justify-center"
+              className="flex items-center gap-2 w-full bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors justify-center"
               onClick={() => setSenderPopover(null)}
             >
               <MessageCircle size={16} />
@@ -413,7 +462,7 @@ export default function GroupView({
             <h2 className="font-semibold text-gray-900">What&apos;s worked for us</h2>
             <button
               onClick={() => setShowResourceForm(!showResourceForm)}
-              className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium"
+              className="flex items-center gap-1.5 text-sm text-violet-600 hover:text-violet-700 font-medium"
             >
               <PlusCircle size={16} /> Add resource
             </button>
@@ -430,21 +479,21 @@ export default function GroupView({
                 value={resourceForm.title}
                 onChange={(e) => setResourceForm({ ...resourceForm, title: e.target.value })}
                 placeholder="Resource title *"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
               />
               <textarea
                 value={resourceForm.description}
                 onChange={(e) => setResourceForm({ ...resourceForm, description: e.target.value })}
                 placeholder="What helped? (optional)"
                 rows={2}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
               />
               <input
                 type="url"
                 value={resourceForm.url}
                 onChange={(e) => setResourceForm({ ...resourceForm, url: e.target.value })}
                 placeholder="Link (optional)"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
               />
               <div className="flex gap-2 justify-end">
                 <button
@@ -457,7 +506,7 @@ export default function GroupView({
                 <button
                   type="submit"
                   disabled={addingResource}
-                  className="text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg transition-colors"
+                  className="text-sm bg-violet-600 hover:bg-violet-700 text-white font-medium px-4 py-2 rounded-lg transition-colors"
                 >
                   {addingResource ? "Adding…" : "Add"}
                 </button>
@@ -481,7 +530,7 @@ export default function GroupView({
                         href={r.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-700 ml-2 flex-shrink-0"
+                        className="text-violet-600 hover:text-violet-700 ml-2 flex-shrink-0"
                       >
                         <ExternalLink size={16} />
                       </a>

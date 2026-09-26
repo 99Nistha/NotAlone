@@ -68,21 +68,21 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#faf9ff] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-violet-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-[#faf9ff] flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-lg">
         <Link href="/" className="flex items-center justify-center gap-2 mb-8">
-          <Heart className="text-blue-600" size={26} fill="currentColor" />
+          <Heart className="text-rose-500" size={26} fill="currentColor" />
           <span className="text-xl font-bold text-gray-900">Not Alone</span>
         </Link>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-violet-100/60 p-8">
           <div className="flex items-center gap-3 mb-6">
             <Link href="/dashboard" className="text-gray-400 hover:text-gray-700">
               <ArrowLeft size={20} />
@@ -95,8 +95,8 @@ export default function SettingsPage() {
 
           {/* Avatar placeholder */}
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center">
-              <User className="text-blue-500" size={28} />
+            <div className="w-16 h-16 bg-violet-50 rounded-full flex items-center justify-center">
+              <User className="text-violet-500" size={28} />
             </div>
           </div>
 
@@ -121,7 +121,7 @@ export default function SettingsPage() {
                 required
                 value={form.full_name}
                 onChange={(e) => setForm({ ...form, full_name: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500 text-gray-900"
               />
             </div>
 
@@ -134,7 +134,7 @@ export default function SettingsPage() {
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 placeholder="+1 555 000 0000"
-                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-400"
+                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500 text-gray-900 placeholder-gray-400"
               />
             </div>
 
@@ -161,7 +161,7 @@ export default function SettingsPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+                className="flex-1 bg-violet-600 hover:bg-violet-700 disabled:bg-violet-400 text-white font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
               >
                 <Save size={15} />
                 {saving ? "Saving…" : "Save changes"}

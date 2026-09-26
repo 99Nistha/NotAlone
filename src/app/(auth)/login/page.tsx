@@ -35,20 +35,20 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-[#faf9ff] flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <Link href="/" className="flex items-center justify-center gap-2 mb-8">
-          <Heart className="text-blue-600" size={28} fill="currentColor" />
+          <Heart className="text-rose-500" size={28} fill="currentColor" />
           <span className="text-2xl font-bold text-gray-900">Not Alone</span>
         </Link>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-violet-100/60 p-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome back</h1>
           <p className="text-gray-500 mb-6">Your community is waiting.</p>
 
           {error && (
-            <div className="bg-red-50 text-red-700 text-sm px-4 py-3 rounded-lg mb-5">
+            <div className="bg-red-50 text-red-700 text-sm px-4 py-3 rounded-xl mb-5">
               {error}
             </div>
           )}
@@ -64,7 +64,7 @@ export default function LoginPage() {
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 placeholder="jane@example.com"
-                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               />
             </div>
 
@@ -78,14 +78,14 @@ export default function LoginPage() {
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 placeholder="Your password"
-                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 rounded-lg transition-colors"
+              className="w-full bg-violet-600 hover:bg-violet-700 disabled:bg-violet-400 text-white font-semibold py-3 rounded-xl transition-colors"
             >
               {loading ? "Logging in…" : "Log in"}
             </button>
@@ -94,11 +94,11 @@ export default function LoginPage() {
           <div className="flex justify-between items-center mt-6">
             <p className="text-sm text-gray-500">
               Don&apos;t have an account?{" "}
-              <Link href="/register" className="text-blue-600 hover:underline font-medium">
+              <Link href="/register" className="text-violet-600 hover:underline font-medium">
                 Join free
               </Link>
             </p>
-            <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+            <Link href="/forgot-password" className="text-sm text-violet-600 hover:underline">
               Forgot password?
             </Link>
           </div>

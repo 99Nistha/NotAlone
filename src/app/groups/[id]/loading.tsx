@@ -12,7 +12,7 @@ export default function GroupLoading() {
             <div className="h-3 w-20 bg-gray-100 rounded animate-pulse mb-1" />
             <div
               className={`h-10 rounded-2xl animate-pulse ${
-                i % 2 === 0 ? "w-48 bg-blue-100" : "w-56 bg-gray-200"
+                i % 2 === 0 ? "w-48 bg-violet-100" : "w-56 bg-gray-200"
               }`}
             />
           </div>

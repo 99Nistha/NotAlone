@@ -164,22 +164,22 @@ export default function EditChildPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#faf9ff] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-violet-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-[#faf9ff] flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-lg">
         {/* Logo */}
         <Link href="/" className="flex items-center justify-center gap-2 mb-8">
-          <Heart className="text-blue-600" size={26} fill="currentColor" />
+          <Heart className="text-rose-500" size={26} fill="currentColor" />
           <span className="text-xl font-bold text-gray-900">Not Alone</span>
         </Link>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-violet-100/60 p-8">
           <div className="flex items-center gap-3 mb-6">
             <Link href="/dashboard" className="text-gray-400 hover:text-gray-700">
               <ArrowLeft size={20} />
@@ -219,7 +219,7 @@ export default function EditChildPage() {
                 required
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500 text-gray-900"
               />
             </div>
 
@@ -234,7 +234,7 @@ export default function EditChildPage() {
                 max="17"
                 value={form.age}
                 onChange={(e) => setForm({ ...form, age: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500 text-gray-900"
               />
             </div>
 
@@ -254,7 +254,7 @@ export default function EditChildPage() {
                   }
                   rows={4}
                   placeholder="Describe your child's condition…"
-                  className={`w-full border rounded-lg px-4 py-3 pr-14 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-gray-900 placeholder-gray-400 transition-colors ${
+                  className={`w-full border rounded-lg px-4 py-3 pr-14 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none text-gray-900 placeholder-gray-400 transition-colors ${
                     isRecording ? "border-red-400 bg-red-50" : "border-gray-200"
                   }`}
                 />
@@ -265,7 +265,7 @@ export default function EditChildPage() {
                   className={`absolute top-3 right-3 p-2 rounded-lg transition-colors ${
                     isRecording
                       ? "bg-red-100 text-red-600 hover:bg-red-200 animate-pulse"
-                      : "bg-gray-100 text-gray-500 hover:bg-blue-100 hover:text-blue-600"
+                      : "bg-gray-100 text-gray-500 hover:bg-violet-100 hover:text-violet-600"
                   }`}
                 >
                   {isRecording ? <MicOff size={16} /> : <Mic size={16} />}
@@ -289,7 +289,7 @@ export default function EditChildPage() {
               <button
                 type="submit"
                 disabled={saving || success}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+                className="flex-1 bg-violet-600 hover:bg-violet-700 disabled:bg-violet-400 text-white font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
               >
                 <Save size={15} />
                 {saving ? "Saving…" : "Save changes"}

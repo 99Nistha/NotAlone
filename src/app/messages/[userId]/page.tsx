@@ -22,8 +22,6 @@ export default async function DMPage({
     .eq("id", userId)
     .single();
 
-  if (!otherProfile) redirect("/dashboard");
-
   // Get initial messages (last 50, ascending)
   const { data: messages } = await supabase
     .from("direct_messages")
@@ -48,7 +46,7 @@ export default async function DMPage({
   return (
     <DMView
       otherUserId={userId}
-      otherUserName={otherProfile.full_name ?? "Member"}
+      otherUserName={otherProfile?.full_name ?? "Parent"}
       initialMessages={messages ?? []}
       currentUserId={user.id}
       currentUserName={myProfile?.full_name ?? user.email ?? "You"}

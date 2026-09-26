@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
@@ -123,12 +126,12 @@ export default async function DashboardPage() {
   const hasGroups = groups.length > 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#faf9ff]">
       {/* Navbar */}
       <nav className="bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2">
-            <Heart className="text-blue-600" size={22} fill="currentColor" />
+            <Heart className="text-rose-500" size={22} fill="currentColor" />
             <span className="text-lg font-bold text-gray-900">Not Alone</span>
           </Link>
           <div className="flex items-center gap-3">
@@ -154,9 +157,9 @@ export default async function DashboardPage() {
 
         {/* Empty state — no children yet */}
         {!hasChildren && (
-          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-8 text-center mb-8">
-            <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <PlusCircle className="text-blue-600" size={28} />
+          <div className="bg-violet-50 border border-violet-100 rounded-2xl p-8 text-center mb-8">
+            <div className="w-14 h-14 bg-violet-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <PlusCircle className="text-violet-600" size={28} />
             </div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
               Start by adding your child
@@ -166,7 +169,7 @@ export default async function DashboardPage() {
             </p>
             <Link
               href="/onboarding"
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+              className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
             >
               Add my child <ArrowRight size={18} />
             </Link>
@@ -180,7 +183,7 @@ export default async function DashboardPage() {
               <h2 className="text-lg font-semibold text-gray-900">Your children</h2>
               <Link
                 href="/onboarding"
-                className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                className="text-sm text-violet-600 hover:underline flex items-center gap-1"
               >
                 <PlusCircle size={14} /> Add another
               </Link>
@@ -200,14 +203,14 @@ export default async function DashboardPage() {
                     </div>
                     <Link
                       href={`/children/${child.id}/edit`}
-                      className="text-gray-400 hover:text-blue-600 transition-colors p-1 rounded-lg hover:bg-blue-50"
+                      className="text-gray-400 hover:text-violet-600 transition-colors p-1 rounded-lg hover:bg-violet-50"
                       title="Edit profile"
                     >
                       <Pencil size={15} />
                     </Link>
                   </div>
                   {child.condition_normalized && (
-                    <div className="mt-2 inline-block bg-blue-50 text-blue-700 text-xs font-medium px-3 py-1 rounded-full">
+                    <div className="mt-2 inline-block bg-violet-50 text-violet-700 text-xs font-medium px-3 py-1 rounded-full">
                       {child.condition_normalized}
                     </div>
                   )}
@@ -226,13 +229,13 @@ export default async function DashboardPage() {
                 <Link
                   key={group.id}
                   href={`/groups/${group.id}`}
-                  className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group"
+                  className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-violet-200 transition-all group"
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <div className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">
+                    <div className="font-semibold text-gray-900 group-hover:text-violet-600 transition-colors leading-tight">
                       {group.condition_name}
                     </div>
-                    <ArrowRight className="text-gray-400 group-hover:text-blue-600 transition-colors flex-shrink-0 ml-2" size={18} />
+                    <ArrowRight className="text-gray-400 group-hover:text-violet-600 transition-colors flex-shrink-0 ml-2" size={18} />
                   </div>
 
                   {/* Last message preview */}
@@ -272,13 +275,13 @@ export default async function DashboardPage() {
                 <Link
                   key={thread.otherUserId}
                   href={`/messages/${thread.otherUserId}`}
-                  className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group"
+                  className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-violet-200 transition-all group"
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <div className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">
+                    <div className="font-semibold text-gray-900 group-hover:text-violet-600 transition-colors leading-tight">
                       {thread.otherUserName}
                     </div>
-                    <ArrowRight className="text-gray-400 group-hover:text-blue-600 transition-colors flex-shrink-0 ml-2" size={18} />
+                    <ArrowRight className="text-gray-400 group-hover:text-violet-600 transition-colors flex-shrink-0 ml-2" size={18} />
                   </div>
                   <p className="text-sm text-gray-500 mb-3 line-clamp-2">
                     &ldquo;{thread.lastMessage}&rdquo;

@@ -49,13 +49,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Add user to group
-    await supabase
+    const { error: joinError } = await supabase
       .from("group_members")
       .upsert({
         user_id: user.id,
         group_id: group.id,
         child_id: childId || null,
       });
+
+    // Insert a system join message so group members see "X joined"
+    if (!joinError && !isNewGroup) {
+      await supabase.from("messages").insert({
+        group_id: group.id,
+        user_id: user.id,
+        content: "[[joined]]",
+      });
+    }
 
     // Update child with normalized condition
     if (childId) {

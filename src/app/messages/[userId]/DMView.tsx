@@ -113,7 +113,7 @@ export default function DMView({
   }
 
   function formatTime(ts: string) {
-    return new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return new Date(ts).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
   }
 
   function getDateLabel(ts: string) {
@@ -144,7 +144,7 @@ export default function DMView({
             </div>
           </div>
           <Link href="/" className="flex items-center gap-1.5">
-            <Heart className="text-blue-600" size={18} fill="currentColor" />
+            <Heart className="text-rose-500" size={18} fill="currentColor" />
             <span className="text-sm font-bold text-gray-900 hidden sm:block">Not Alone</span>
           </Link>
         </div>
@@ -189,7 +189,7 @@ export default function DMView({
                   <div
                     className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                       isOwn
-                        ? "bg-blue-600 text-white rounded-tr-sm"
+                        ? "bg-violet-600 text-white rounded-tr-sm"
                         : "bg-white border border-gray-100 text-gray-900 rounded-tl-sm shadow-sm"
                     }`}
                   >
@@ -211,12 +211,12 @@ export default function DMView({
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder={`Message ${otherUserName}…`}
-              className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
             />
             <button
               type="submit"
               disabled={sending || !newMessage.trim()}
-              className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white px-4 py-2.5 rounded-xl transition-colors"
+              className="bg-violet-600 hover:bg-violet-700 disabled:bg-violet-300 text-white px-4 py-2.5 rounded-xl transition-colors"
             >
               <Send size={18} />
             </button>

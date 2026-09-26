@@ -3,24 +3,24 @@ import { Heart, Users, MessageCircle, BookOpen, Shield, ArrowRight } from "lucid
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#faf9ff]">
       {/* Navbar */}
-      <nav className="border-b border-gray-100 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="border-b border-violet-100/60 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Heart className="text-blue-600" size={24} fill="currentColor" />
+            <Heart className="text-rose-500" size={24} fill="currentColor" />
             <span className="text-xl font-bold text-gray-900">Not Alone</span>
           </div>
           <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="text-gray-600 hover:text-gray-900 font-medium px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+              className="text-gray-600 hover:text-gray-900 font-medium px-4 py-2 rounded-xl hover:bg-violet-50 transition-colors"
             >
               Log in
             </Link>
             <Link
               href="/register"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-lg transition-colors"
+              className="bg-violet-600 hover:bg-violet-700 text-white font-medium px-5 py-2 rounded-xl transition-colors"
             >
               Join Free
             </Link>
@@ -30,13 +30,15 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-16 text-center">
-        <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-sm font-medium px-4 py-1.5 rounded-full mb-8">
+        <div className="inline-flex items-center gap-2 bg-violet-50 text-violet-700 text-sm font-medium px-4 py-1.5 rounded-full mb-8">
           <Heart size={14} fill="currentColor" />
           Free forever for families
         </div>
         <h1 className="text-5xl sm:text-6xl font-extrabold text-gray-900 leading-tight mb-6 text-balance">
           You are{" "}
-          <span className="text-blue-600">not alone</span>{" "}
+          <span className="bg-gradient-to-r from-violet-600 to-rose-500 bg-clip-text text-transparent">
+            not alone
+          </span>{" "}
           on this journey
         </h1>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10 text-balance">
@@ -46,14 +48,14 @@ export default function LandingPage() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="/register"
-            className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold px-8 py-4 rounded-xl transition-colors shadow-lg shadow-blue-200"
+            className="inline-flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 text-white text-lg font-semibold px-8 py-4 rounded-xl transition-colors shadow-lg shadow-violet-200"
           >
             Find your community
             <ArrowRight size={20} />
           </Link>
           <Link
             href="/login"
-            className="inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 text-lg font-semibold px-8 py-4 rounded-xl border border-gray-200 transition-colors"
+            className="inline-flex items-center justify-center gap-2 bg-white hover:bg-violet-50 text-gray-700 text-lg font-semibold px-8 py-4 rounded-xl border border-violet-100 transition-colors"
           >
             Already a member? Log in
           </Link>
@@ -61,7 +63,7 @@ export default function LandingPage() {
       </section>
 
       {/* Problem / Solution */}
-      <section className="bg-gray-50 py-20">
+      <section className="bg-white py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -112,31 +114,37 @@ export default function LandingPage() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {[
             {
-              icon: <Heart className="text-blue-600" size={32} />,
+              icon: <Heart className="text-rose-500" size={28} />,
+              bg: "bg-rose-50",
               title: "Condition Matching",
               desc: "Describe your child's condition in plain English — our AI connects you to the right group instantly.",
             },
             {
-              icon: <MessageCircle className="text-blue-600" size={32} />,
+              icon: <MessageCircle className="text-violet-600" size={28} />,
+              bg: "bg-violet-50",
               title: "Group Chat",
               desc: "Real-time conversations with parents who share your exact diagnosis. Ask anything, any time.",
             },
             {
-              icon: <BookOpen className="text-blue-600" size={32} />,
+              icon: <BookOpen className="text-amber-500" size={28} />,
+              bg: "bg-amber-50",
               title: "Resource Library",
               desc: "Crowd-sourced tips, treatments, schools, and specialists — built by families, for families.",
             },
             {
-              icon: <Shield className="text-blue-600" size={32} />,
+              icon: <Shield className="text-emerald-600" size={28} />,
+              bg: "bg-emerald-50",
               title: "Safe & Moderated",
               desc: "Every group is moderated. Health data is encrypted. Your privacy is our priority.",
             },
           ].map((feature) => (
             <div
               key={feature.title}
-              className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow"
+              className="bg-white border border-violet-100/60 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow"
             >
-              <div className="mb-4">{feature.icon}</div>
+              <div className={`w-12 h-12 ${feature.bg} rounded-xl flex items-center justify-center mb-4`}>
+                {feature.icon}
+              </div>
               <h3 className="font-semibold text-gray-900 mb-2">{feature.title}</h3>
               <p className="text-gray-600 text-sm leading-relaxed">{feature.desc}</p>
             </div>
@@ -145,7 +153,7 @@ export default function LandingPage() {
       </section>
 
       {/* Social proof */}
-      <section className="bg-blue-600 py-16">
+      <section className="bg-gradient-to-r from-violet-600 to-rose-500 py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
           <div className="grid sm:grid-cols-3 gap-8 text-white">
             {[
@@ -155,7 +163,7 @@ export default function LandingPage() {
             ].map((item) => (
               <div key={item.label}>
                 <div className="text-4xl font-extrabold mb-2">{item.stat}</div>
-                <div className="text-blue-200">{item.label}</div>
+                <div className="text-white/80">{item.label}</div>
               </div>
             ))}
           </div>
@@ -172,7 +180,7 @@ export default function LandingPage() {
         </p>
         <Link
           href="/register"
-          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold px-10 py-4 rounded-xl transition-colors shadow-lg shadow-blue-200"
+          className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white text-lg font-semibold px-10 py-4 rounded-xl transition-colors shadow-lg shadow-violet-200"
         >
           Get started — it&apos;s free
           <ArrowRight size={20} />
@@ -180,10 +188,10 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-100 py-8">
+      <footer className="border-t border-violet-100/60 py-8 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-gray-500 text-sm">
           <div className="flex items-center gap-2">
-            <Heart className="text-blue-600" size={16} fill="currentColor" />
+            <Heart className="text-rose-500" size={16} fill="currentColor" />
             <span>Not Alone — Always free for families</span>
           </div>
           <div className="flex gap-6">

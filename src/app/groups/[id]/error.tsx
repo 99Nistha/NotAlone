@@ -23,7 +23,7 @@ export default function GroupError({
       <div className="flex gap-3">
         <button
           onClick={reset}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-lg text-sm"
+          className="bg-violet-600 hover:bg-violet-700 text-white font-medium px-5 py-2 rounded-lg text-sm"
         >
           Retry
         </button>

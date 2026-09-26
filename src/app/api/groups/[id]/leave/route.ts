@@ -19,13 +19,22 @@ export async function DELETE(
     .eq("user_id", user.id)
     .single();
 
-  const { error } = await supabase
+  // Insert system leave message BEFORE deleting membership
+  // (user must still be a member to pass the messages INSERT policy)
+  await supabase.from("messages").insert({
+    group_id: id,
+    user_id: user.id,
+    content: "[[left]]",
+  });
+
+  const { error, count } = await supabase
     .from("group_members")
-    .delete()
+    .delete({ count: "exact" })
     .eq("group_id", id)
     .eq("user_id", user.id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (count === 0) return NextResponse.json({ error: "Not a member of this group" }, { status: 400 });
 
   // Clear condition badge on the child so it no longer shows a group highlight
   if (membership?.child_id) {
