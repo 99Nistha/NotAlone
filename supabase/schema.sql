@@ -182,3 +182,26 @@ CREATE TRIGGER on_group_join
 
 -- Enable Realtime for messages table
 ALTER PUBLICATION supabase_realtime ADD TABLE messages;
+
+-- ─────────────────────────────────────────────
+-- Direct Messages
+-- ─────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS direct_messages (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  sender_id    UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  recipient_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  content      TEXT NOT NULL,
+  created_at   TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE direct_messages ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can read own DMs"
+  ON direct_messages FOR SELECT
+  USING (auth.uid() = sender_id OR auth.uid() = recipient_id);
+
+CREATE POLICY "Users can send DMs"
+  ON direct_messages FOR INSERT
+  WITH CHECK (auth.uid() = sender_id);
+
+ALTER PUBLICATION supabase_realtime ADD TABLE direct_messages;

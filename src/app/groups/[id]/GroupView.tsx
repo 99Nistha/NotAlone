@@ -323,10 +323,20 @@ export default function GroupView({
 
                   <div className={`flex flex-col mb-2 ${isOwn ? "items-end" : "items-start"}`}>
                     <div className="text-xs text-gray-400 mb-1 px-1">
-                      {isOwn
-                        ? "You"
-                        : (msg.profiles as { full_name?: string })?.full_name || "Member"}{" "}
-                      · {formatTime(msg.created_at)}
+                      {isOwn ? (
+                        <>You · {formatTime(msg.created_at)}</>
+                      ) : (
+                        <>
+                          <Link
+                            href={`/messages/${msg.user_id}`}
+                            className="hover:text-blue-600 hover:underline transition-colors"
+                            title="Send a private message"
+                          >
+                            {(msg.profiles as { full_name?: string })?.full_name || "Member"}
+                          </Link>
+                          {" · "}{formatTime(msg.created_at)}
+                        </>
+                      )}
                     </div>
                     <div
                       className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${

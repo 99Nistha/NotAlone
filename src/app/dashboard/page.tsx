@@ -4,6 +4,13 @@ import { createClient } from "@/lib/supabase/server";
 import { Heart, MessageCircle, Users, ArrowRight, PlusCircle, Pencil, Settings } from "lucide-react";
 import SignOutButton from "@/components/SignOutButton";
 
+interface DMThread {
+  otherUserId: string;
+  otherUserName: string;
+  lastMessage: string;
+  lastMessageAt: string;
+}
+
 export default async function DashboardPage() {
   const supabase = await createClient();
 
@@ -71,6 +78,39 @@ export default async function DashboardPage() {
       }
     });
   }
+
+  // Get DM threads — latest message per unique conversation
+  const { data: dmMessages } = await supabase
+    .from("direct_messages")
+    .select("id, sender_id, recipient_id, content, created_at")
+    .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  // Deduplicate: keep only the latest message per conversation partner
+  const dmThreadMap: Record<string, { content: string; created_at: string; otherUserId: string }> = {};
+  dmMessages?.forEach((msg) => {
+    const otherUserId = msg.sender_id === user.id ? msg.recipient_id : msg.sender_id;
+    if (!dmThreadMap[otherUserId]) {
+      dmThreadMap[otherUserId] = { content: msg.content, created_at: msg.created_at, otherUserId };
+    }
+  });
+
+  // Fetch names of other users
+  const dmUserIds = Object.keys(dmThreadMap);
+  const { data: dmProfiles } = dmUserIds.length
+    ? await supabase.from("profiles").select("id, full_name").in("id", dmUserIds)
+    : { data: [] };
+
+  const dmProfileMap: Record<string, string> = {};
+  dmProfiles?.forEach((p) => { dmProfileMap[p.id] = p.full_name ?? "Member"; });
+
+  const dmThreads: DMThread[] = Object.values(dmThreadMap).map((t) => ({
+    otherUserId: t.otherUserId,
+    otherUserName: dmProfileMap[t.otherUserId] ?? "Member",
+    lastMessage: t.content,
+    lastMessageAt: t.created_at,
+  }));
 
   // Get user's children
   const { data: children } = await supabase
@@ -216,6 +256,38 @@ export default async function DashboardPage() {
                         {new Date(lastMessagesByGroup[group.id].created_at).toLocaleDateString([], { month: "short", day: "numeric" })}
                       </span>
                     )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Direct Messages */}
+        {dmThreads.length > 0 && (
+          <div className="mt-10">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Direct messages</h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {dmThreads.map((thread) => (
+                <Link
+                  key={thread.otherUserId}
+                  href={`/messages/${thread.otherUserId}`}
+                  className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">
+                      {thread.otherUserName}
+                    </div>
+                    <ArrowRight className="text-gray-400 group-hover:text-blue-600 transition-colors flex-shrink-0 ml-2" size={18} />
+                  </div>
+                  <p className="text-sm text-gray-500 mb-3 line-clamp-2">
+                    &ldquo;{thread.lastMessage}&rdquo;
+                  </p>
+                  <div className="flex justify-end">
+                    <span className="flex items-center gap-1 text-xs text-gray-400">
+                      <MessageCircle size={12} />
+                      {new Date(thread.lastMessageAt).toLocaleDateString([], { month: "short", day: "numeric" })}
+                    </span>
                   </div>
                 </Link>
               ))}

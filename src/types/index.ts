@@ -34,6 +34,15 @@ export interface Resource {
   profiles?: Partial<Profile> | null;
 }
 
+export interface DirectMessage {
+  id: string;
+  sender_id: string;
+  recipient_id: string;
+  content: string;
+  created_at: string;
+  profiles?: Partial<Profile> | null;
+}
+
 export interface Child {
   id: string;
   parent_id: string;
