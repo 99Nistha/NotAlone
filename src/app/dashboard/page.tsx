@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { Heart, MessageCircle, Users, ArrowRight, PlusCircle } from "lucide-react";
+import { Heart, MessageCircle, Users, ArrowRight, PlusCircle, Pencil } from "lucide-react";
 import SignOutButton from "@/components/SignOutButton";
 
 export default async function DashboardPage() {
@@ -132,10 +132,21 @@ export default async function DashboardPage() {
                   key={child.id}
                   className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm"
                 >
-                  <div className="font-semibold text-gray-900 text-lg">{child.name}</div>
-                  {child.age && (
-                    <div className="text-sm text-gray-500">Age {child.age}</div>
-                  )}
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <div className="font-semibold text-gray-900 text-lg">{child.name}</div>
+                      {child.age && (
+                        <div className="text-sm text-gray-500">Age {child.age}</div>
+                      )}
+                    </div>
+                    <Link
+                      href={`/children/${child.id}/edit`}
+                      className="text-gray-400 hover:text-blue-600 transition-colors p-1 rounded-lg hover:bg-blue-50"
+                      title="Edit profile"
+                    >
+                      <Pencil size={15} />
+                    </Link>
+                  </div>
                   {child.condition_normalized && (
                     <div className="mt-2 inline-block bg-blue-50 text-blue-700 text-xs font-medium px-3 py-1 rounded-full">
                       {child.condition_normalized}
