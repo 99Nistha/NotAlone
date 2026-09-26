@@ -298,12 +298,23 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        {/* Has children but no groups — shouldn't usually happen */}
+        {/* Has children but no groups */}
         {hasChildren && !hasGroups && (
-          <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-6 text-center">
-            <p className="text-gray-700">
-              Your group is being set up. Try refreshing in a moment.
+          <div className="bg-violet-50 border border-violet-100 rounded-xl p-6 text-center">
+            <p className="text-gray-700 font-medium mb-1">
+              You&apos;re not part of any active group yet.
             </p>
+            <p className="text-gray-500 text-sm mb-4">
+              Edit your child&apos;s profile and save to be matched with the right families.
+            </p>
+            {children && children.length > 0 && (
+              <a
+                href={`/children/${children[0].id}/edit`}
+                className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"
+              >
+                Update child profile
+              </a>
+            )}
           </div>
         )}
       </main>
