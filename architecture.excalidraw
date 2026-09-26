@@ -4,348 +4,229 @@
   "source": "https://excalidraw.com",
   "elements": [
     {
-      "id": "user-box",
-      "type": "rectangle",
-      "x": 60,
-      "y": 60,
-      "width": 140,
-      "height": 60,
-      "angle": 0,
-      "strokeColor": "#1971c2",
-      "backgroundColor": "#d0ebff",
-      "fillStyle": "solid",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 0,
-      "opacity": 100,
-      "roundness": { "type": 3 }
+      "id": "title", "type": "text", "x": 220, "y": 14, "width": 560, "height": 36,
+      "text": "Not Alone — System Architecture", "fontSize": 26, "fontFamily": 1,
+      "textAlign": "center", "strokeColor": "#1e1e1e", "backgroundColor": "transparent",
+      "fillStyle": "solid", "angle": 0, "opacity": 100
     },
     {
-      "id": "user-label",
-      "type": "text",
-      "x": 90,
-      "y": 80,
-      "width": 80,
-      "height": 20,
-      "text": "Parent (User)",
-      "fontSize": 14,
-      "fontFamily": 1,
-      "textAlign": "center",
-      "strokeColor": "#1971c2"
+      "id": "subtitle", "type": "text", "x": 260, "y": 52, "width": 480, "height": 18,
+      "text": "not-alone-jade.vercel.app  •  github.com/99Nistha/NotAlone", "fontSize": 12,
+      "fontFamily": 1, "textAlign": "center", "strokeColor": "#868e96",
+      "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
+    },
+
+    {
+      "id": "user-box", "type": "rectangle", "x": 30, "y": 100, "width": 150, "height": 70,
+      "strokeColor": "#1971c2", "backgroundColor": "#d0ebff", "fillStyle": "solid",
+      "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "roundness": { "type": 3 }, "angle": 0
     },
     {
-      "id": "browser-box",
-      "type": "rectangle",
-      "x": 60,
-      "y": 180,
-      "width": 140,
-      "height": 60,
-      "angle": 0,
-      "strokeColor": "#2f9e44",
-      "backgroundColor": "#d3f9d8",
-      "fillStyle": "solid",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 0,
-      "opacity": 100,
-      "roundness": { "type": 3 }
+      "id": "user-label", "type": "text", "x": 45, "y": 116, "width": 120, "height": 20,
+      "text": "Parent (User)", "fontSize": 14, "fontFamily": 1, "textAlign": "center",
+      "strokeColor": "#1971c2", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
     },
     {
-      "id": "browser-label",
-      "type": "text",
-      "x": 75,
-      "y": 200,
-      "width": 110,
-      "height": 20,
-      "text": "Browser / Next.js",
-      "fontSize": 13,
-      "fontFamily": 1,
-      "textAlign": "center",
-      "strokeColor": "#2f9e44"
+      "id": "user-sub", "type": "text", "x": 45, "y": 138, "width": 120, "height": 16,
+      "text": "Browser / Mobile", "fontSize": 11, "fontFamily": 1, "textAlign": "center",
+      "strokeColor": "#1971c2", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
+    },
+
+    {
+      "id": "arrow-user-vercel", "type": "arrow", "x": 182, "y": 135, "width": 118, "height": 0,
+      "strokeColor": "#495057", "strokeWidth": 1.5, "endArrowhead": "arrow", "startArrowhead": null,
+      "angle": 0, "opacity": 100, "backgroundColor": "transparent", "fillStyle": "solid", "roughness": 0
+    },
+
+    {
+      "id": "vercel-box", "type": "rectangle", "x": 300, "y": 80, "width": 190, "height": 120,
+      "strokeColor": "#374151", "backgroundColor": "#f1f5f9", "fillStyle": "solid",
+      "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "roundness": { "type": 3 }, "angle": 0
     },
     {
-      "id": "browser-sub",
-      "type": "text",
-      "x": 80,
-      "y": 218,
-      "width": 100,
-      "height": 16,
-      "text": "React App Router",
-      "fontSize": 11,
-      "fontFamily": 1,
-      "textAlign": "center",
-      "strokeColor": "#2f9e44"
+      "id": "vercel-label", "type": "text", "x": 338, "y": 92, "width": 114, "height": 20,
+      "text": "Vercel (CDN)", "fontSize": 15, "fontFamily": 1, "textAlign": "center",
+      "strokeColor": "#111827", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
     },
     {
-      "id": "arrow-user-browser",
-      "type": "arrow",
-      "x": 130,
-      "y": 122,
-      "width": 0,
-      "height": 56,
-      "strokeColor": "#868e96",
-      "strokeWidth": 1,
-      "endArrowhead": "arrow",
-      "startArrowhead": null
+      "id": "vercel-sub", "type": "text", "x": 308, "y": 114, "width": 174, "height": 76,
+      "text": "Next.js 14 App Router\nTypeScript + Tailwind CSS\nServerless API Routes\nEdge Middleware (auth)\nAuto-deploy from main branch",
+      "fontSize": 11, "fontFamily": 1, "textAlign": "center",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
+    },
+
+    {
+      "id": "arrow-vercel-supabase", "type": "arrow", "x": 395, "y": 202, "width": 0, "height": 78,
+      "strokeColor": "#495057", "strokeWidth": 1.5, "endArrowhead": "arrow", "startArrowhead": "arrow",
+      "angle": 0, "opacity": 100, "backgroundColor": "transparent", "fillStyle": "solid", "roughness": 0
+    },
+
+    {
+      "id": "supabase-box", "type": "rectangle", "x": 300, "y": 280, "width": 190, "height": 150,
+      "strokeColor": "#3b82f6", "backgroundColor": "#eff6ff", "fillStyle": "solid",
+      "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "roundness": { "type": 3 }, "angle": 0
     },
     {
-      "id": "nextjs-api-box",
-      "type": "rectangle",
-      "x": 300,
-      "y": 180,
-      "width": 160,
-      "height": 60,
-      "angle": 0,
-      "strokeColor": "#e67700",
-      "backgroundColor": "#fff3bf",
-      "fillStyle": "solid",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 0,
-      "opacity": 100,
-      "roundness": { "type": 3 }
+      "id": "supabase-label", "type": "text", "x": 350, "y": 292, "width": 90, "height": 20,
+      "text": "Supabase", "fontSize": 15, "fontFamily": 1, "textAlign": "center",
+      "strokeColor": "#1d4ed8", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
     },
     {
-      "id": "nextjs-api-label",
-      "type": "text",
-      "x": 315,
-      "y": 200,
-      "width": 130,
-      "height": 20,
-      "text": "Next.js API Routes",
-      "fontSize": 13,
-      "fontFamily": 1,
-      "textAlign": "center",
-      "strokeColor": "#e67700"
+      "id": "supabase-sub", "type": "text", "x": 308, "y": 314, "width": 174, "height": 108,
+      "text": "PostgreSQL Database\nRow Level Security (RLS)\nAuth — JWT Sessions\nRealtime WebSockets\nStorage (document uploads)\nsupabase/schema.sql",
+      "fontSize": 11, "fontFamily": 1, "textAlign": "center",
+      "strokeColor": "#3b82f6", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
+    },
+
+    {
+      "id": "matcher-box", "type": "rectangle", "x": 570, "y": 80, "width": 210, "height": 120,
+      "strokeColor": "#7c3aed", "backgroundColor": "#f5f3ff", "fillStyle": "solid",
+      "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "roundness": { "type": 3 }, "angle": 0
     },
     {
-      "id": "nextjs-api-sub",
-      "type": "text",
-      "x": 320,
-      "y": 218,
-      "width": 120,
-      "height": 16,
-      "text": "Serverless (Vercel)",
-      "fontSize": 11,
-      "fontFamily": 1,
-      "textAlign": "center",
-      "strokeColor": "#e67700"
+      "id": "matcher-label", "type": "text", "x": 580, "y": 92, "width": 190, "height": 20,
+      "text": "Condition Matcher (No API)", "fontSize": 13, "fontFamily": 1, "textAlign": "center",
+      "strokeColor": "#5b21b6", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
     },
     {
-      "id": "arrow-browser-api",
-      "type": "arrow",
-      "x": 202,
-      "y": 210,
-      "width": 96,
-      "height": 0,
-      "strokeColor": "#868e96",
-      "strokeWidth": 1,
-      "endArrowhead": "arrow",
-      "startArrowhead": "arrow"
+      "id": "matcher-sub", "type": "text", "x": 580, "y": 114, "width": 190, "height": 76,
+      "text": "src/lib/conditionMatcher.ts\n60+ keyword rules, zero API cost\nScores keywords by length/specificity\n\"speech delay\" → Speech & Language Delay\n\"apraxia\" → Childhood Apraxia of Speech",
+      "fontSize": 11, "fontFamily": 1, "textAlign": "center",
+      "strokeColor": "#7c3aed", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
     },
     {
-      "id": "supabase-box",
-      "type": "rectangle",
-      "x": 300,
-      "y": 340,
-      "width": 160,
-      "height": 100,
-      "angle": 0,
-      "strokeColor": "#3b82f6",
-      "backgroundColor": "#eff6ff",
-      "fillStyle": "solid",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 0,
-      "opacity": 100,
-      "roundness": { "type": 3 }
+      "id": "arrow-vercel-matcher", "type": "arrow", "x": 492, "y": 140, "width": 76, "height": 0,
+      "strokeColor": "#7c3aed", "strokeWidth": 1.5, "endArrowhead": "arrow", "startArrowhead": null,
+      "angle": 0, "opacity": 100, "backgroundColor": "transparent", "fillStyle": "solid", "roughness": 0
     },
     {
-      "id": "supabase-label",
-      "type": "text",
-      "x": 340,
-      "y": 355,
-      "width": 80,
-      "height": 20,
-      "text": "Supabase",
-      "fontSize": 15,
-      "fontFamily": 1,
-      "textAlign": "center",
-      "strokeColor": "#3b82f6"
+      "id": "matcher-arrow-label", "type": "text", "x": 496, "y": 122, "width": 68, "height": 16,
+      "text": "POST /api/ai/match-condition",
+      "fontSize": 9, "fontFamily": 1, "textAlign": "center",
+      "strokeColor": "#7c3aed", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
+    },
+
+    {
+      "id": "github-box", "type": "rectangle", "x": 570, "y": 280, "width": 210, "height": 80,
+      "strokeColor": "#1e1e1e", "backgroundColor": "#f8f9fa", "fillStyle": "solid",
+      "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "roundness": { "type": 3 }, "angle": 0
     },
     {
-      "id": "supabase-sub",
-      "type": "text",
-      "x": 308,
-      "y": 378,
-      "width": 144,
-      "height": 56,
-      "text": "PostgreSQL DB\nAuth (JWT)\nStorage (docs)\nRealtime (chat)",
-      "fontSize": 11,
-      "fontFamily": 1,
-      "textAlign": "center",
-      "strokeColor": "#3b82f6"
+      "id": "github-label", "type": "text", "x": 612, "y": 292, "width": 126, "height": 20,
+      "text": "GitHub", "fontSize": 14, "fontFamily": 1, "textAlign": "center",
+      "strokeColor": "#1e1e1e", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
     },
     {
-      "id": "arrow-api-supabase",
-      "type": "arrow",
-      "x": 380,
-      "y": 242,
-      "width": 0,
-      "height": 96,
-      "strokeColor": "#868e96",
-      "strokeWidth": 1,
-      "endArrowhead": "arrow",
-      "startArrowhead": null
+      "id": "github-sub", "type": "text", "x": 578, "y": 314, "width": 194, "height": 36,
+      "text": "99Nistha/NotAlone\nmain → prod deploy  /  develop → staging",
+      "fontSize": 11, "fontFamily": 1, "textAlign": "center",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
     },
     {
-      "id": "claude-box",
-      "type": "rectangle",
-      "x": 560,
-      "y": 180,
-      "width": 160,
-      "height": 60,
-      "angle": 0,
-      "strokeColor": "#7c3aed",
-      "backgroundColor": "#f3e8ff",
-      "fillStyle": "solid",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 0,
-      "opacity": 100,
-      "roundness": { "type": 3 }
+      "id": "arrow-github-vercel", "type": "arrow",
+      "x": 570, "y": 318, "width": -78, "height": -178,
+      "strokeColor": "#374151", "strokeWidth": 1.5, "endArrowhead": "arrow", "startArrowhead": null,
+      "angle": 0, "opacity": 100, "backgroundColor": "transparent", "fillStyle": "solid", "roughness": 0
     },
     {
-      "id": "claude-label",
-      "type": "text",
-      "x": 575,
-      "y": 198,
-      "width": 130,
-      "height": 20,
-      "text": "Anthropic Claude API",
-      "fontSize": 13,
-      "fontFamily": 1,
-      "textAlign": "center",
-      "strokeColor": "#7c3aed"
+      "id": "arrow-github-label", "type": "text", "x": 500, "y": 232, "width": 80, "height": 14,
+      "text": "push → auto deploy", "fontSize": 10, "fontFamily": 1, "textAlign": "center",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
+    },
+
+    {
+      "id": "db-box", "type": "rectangle", "x": 30, "y": 260, "width": 230, "height": 220,
+      "strokeColor": "#0891b2", "backgroundColor": "#ecfeff", "fillStyle": "solid",
+      "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "roundness": { "type": 3 }, "angle": 0
     },
     {
-      "id": "claude-sub",
-      "type": "text",
-      "x": 578,
-      "y": 218,
-      "width": 124,
-      "height": 16,
-      "text": "Condition Normalizer",
-      "fontSize": 11,
-      "fontFamily": 1,
-      "textAlign": "center",
-      "strokeColor": "#7c3aed"
+      "id": "db-label", "type": "text", "x": 70, "y": 272, "width": 150, "height": 20,
+      "text": "Database Tables (Postgres)", "fontSize": 13, "fontFamily": 1, "textAlign": "center",
+      "strokeColor": "#0e7490", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
     },
     {
-      "id": "arrow-api-claude",
-      "type": "arrow",
-      "x": 462,
-      "y": 210,
-      "width": 96,
-      "height": 0,
-      "strokeColor": "#868e96",
-      "strokeWidth": 1,
-      "endArrowhead": "arrow",
-      "startArrowhead": "arrow"
+      "id": "db-sub", "type": "text", "x": 42, "y": 294, "width": 206, "height": 176,
+      "text": "profiles\n  id, full_name, phone\nchildren\n  name, age, condition_description,\n  condition_normalized\ngroups\n  condition_name\ngroup_members\n  user_id, group_id, child_id\nmessages  (group chat + system pills)\ndirect_messages  (1-on-1 DMs)\nresources  (library per group)\ndocuments  (file uploads)",
+      "fontSize": 11, "fontFamily": 1, "textAlign": "left",
+      "strokeColor": "#0891b2", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
     },
     {
-      "id": "vercel-box",
-      "type": "rectangle",
-      "x": 300,
-      "y": 60,
-      "width": 160,
-      "height": 60,
-      "angle": 0,
-      "strokeColor": "#374151",
-      "backgroundColor": "#f9fafb",
-      "fillStyle": "solid",
-      "strokeWidth": 2,
-      "strokeStyle": "solid",
-      "roughness": 0,
-      "opacity": 100,
-      "roundness": { "type": 3 }
+      "id": "arrow-db-supabase", "type": "arrow", "x": 262, "y": 360, "width": 36, "height": 0,
+      "strokeColor": "#0891b2", "strokeWidth": 1.5, "endArrowhead": "arrow", "startArrowhead": null,
+      "angle": 0, "opacity": 100, "backgroundColor": "transparent", "fillStyle": "solid", "roughness": 0
+    },
+
+    {
+      "id": "flow-box", "type": "rectangle", "x": 30, "y": 510, "width": 750, "height": 140,
+      "strokeColor": "#2f9e44", "backgroundColor": "#f0fdf4", "fillStyle": "solid",
+      "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "roundness": { "type": 3 }, "angle": 0
     },
     {
-      "id": "vercel-label",
-      "type": "text",
-      "x": 340,
-      "y": 80,
-      "width": 80,
-      "height": 20,
-      "text": "Vercel (CDN)",
-      "fontSize": 13,
-      "fontFamily": 1,
-      "textAlign": "center",
-      "strokeColor": "#374151"
+      "id": "flow-label", "type": "text", "x": 50, "y": 522, "width": 200, "height": 20,
+      "text": "End-to-End User Flow", "fontSize": 14, "fontFamily": 1, "textAlign": "left",
+      "strokeColor": "#15803d", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
     },
     {
-      "id": "vercel-sub",
-      "type": "text",
-      "x": 320,
-      "y": 100,
-      "width": 120,
-      "height": 16,
-      "text": "Deploy from GitHub",
-      "fontSize": 11,
-      "fontFamily": 1,
-      "textAlign": "center",
-      "strokeColor": "#374151"
+      "id": "flow-steps", "type": "text", "x": 50, "y": 544, "width": 710, "height": 96,
+      "text": "1. Visit not-alone-jade.vercel.app  →  2. Register (name, email, phone, password)  →  3. Email confirmation via Supabase Auth\n4. Onboarding: add child (name, age) + describe condition (type or mic voice input)  →  5. conditionMatcher.ts scores 60+ keyword rules\n6. Normalised to scientific name e.g. \"Childhood Apraxia of Speech (CAS)\"  →  7. API finds/creates group, upserts group_members, inserts [[joined]] pill\n8. Dashboard: children cards, group cards (live member count + last message), DM threads\n9. Group chat (Supabase Realtime) + Resources tab  →  10. DM any parent privately (1-on-1)  →  11. Leave group / edit child to re-join",
+      "fontSize": 11, "fontFamily": 1, "textAlign": "left",
+      "strokeColor": "#166534", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
+    },
+
+    {
+      "id": "realtime-box", "type": "rectangle", "x": 30, "y": 670, "width": 360, "height": 110,
+      "strokeColor": "#d97706", "backgroundColor": "#fffbeb", "fillStyle": "solid",
+      "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "roundness": { "type": 3 }, "angle": 0
     },
     {
-      "id": "arrow-vercel-nextjs",
-      "type": "arrow",
-      "x": 380,
-      "y": 122,
-      "width": 0,
-      "height": 56,
-      "strokeColor": "#868e96",
-      "strokeWidth": 1,
-      "endArrowhead": "arrow",
-      "startArrowhead": null
+      "id": "realtime-label", "type": "text", "x": 50, "y": 682, "width": 320, "height": 20,
+      "text": "Realtime (Supabase WebSocket)", "fontSize": 13, "fontFamily": 1, "textAlign": "left",
+      "strokeColor": "#92400e", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
     },
     {
-      "id": "flow-label-1",
-      "type": "text",
-      "x": 60,
-      "y": 310,
-      "width": 200,
-      "height": 180,
-      "text": "User Flow:\n1. Visit landing page\n2. Register / Login\n3. Describe condition\n4. Claude normalizes it\n5. Matched to group\n6. Dashboard + chat\n7. Add resources",
-      "fontSize": 13,
-      "fontFamily": 1,
-      "textAlign": "left",
-      "strokeColor": "#343a40"
+      "id": "realtime-sub", "type": "text", "x": 50, "y": 704, "width": 320, "height": 66,
+      "text": "channel: group-{id}  subscribe to messages INSERT\nchannel: dm-{userA}-{userB}  subscribe to direct_messages\n[[joined]] / [[left]] stored in messages table → rendered as pills\nprofilesMapRef (useRef) caches userId→name client-side\nNo polling — push-based via Postgres logical replication",
+      "fontSize": 11, "fontFamily": 1, "textAlign": "left",
+      "strokeColor": "#d97706", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
+    },
+
+    {
+      "id": "security-box", "type": "rectangle", "x": 420, "y": 670, "width": 360, "height": 110,
+      "strokeColor": "#dc2626", "backgroundColor": "#fef2f2", "fillStyle": "solid",
+      "strokeWidth": 2, "strokeStyle": "solid", "roughness": 0, "opacity": 100,
+      "roundness": { "type": 3 }, "angle": 0
     },
     {
-      "id": "realtime-label",
-      "type": "text",
-      "x": 560,
-      "y": 340,
-      "width": 160,
-      "height": 60,
-      "text": "Realtime Chat:\nSupabase WebSocket\nSubscribe to messages\nchannel per group",
-      "fontSize": 12,
-      "fontFamily": 1,
-      "textAlign": "center",
-      "strokeColor": "#3b82f6"
+      "id": "security-label", "type": "text", "x": 440, "y": 682, "width": 320, "height": 20,
+      "text": "Security & RLS Policies", "fontSize": 13, "fontFamily": 1, "textAlign": "left",
+      "strokeColor": "#991b1b", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
     },
     {
-      "id": "title",
-      "type": "text",
-      "x": 200,
-      "y": 10,
-      "width": 320,
-      "height": 32,
-      "text": "Not Alone — Technical Architecture",
-      "fontSize": 22,
-      "fontFamily": 1,
-      "textAlign": "center",
-      "strokeColor": "#1e1e1e"
+      "id": "security-sub", "type": "text", "x": 440, "y": 704, "width": 320, "height": 66,
+      "text": "All tables gated by Supabase RLS + JWT\nprofiles: SELECT open to all authenticated users\ngroup_members: own rows only (join / leave)\nmessages: group members only (read + write)\ndirect_messages: sender OR recipient only\nchildren / documents: own parent_id only",
+      "fontSize": 11, "fontFamily": 1, "textAlign": "left",
+      "strokeColor": "#dc2626", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
+    },
+
+    {
+      "id": "stack-box", "type": "rectangle", "x": 30, "y": 800, "width": 750, "height": 56,
+      "strokeColor": "#6b7280", "backgroundColor": "#f9fafb", "fillStyle": "solid",
+      "strokeWidth": 1.5, "strokeStyle": "dashed", "roughness": 0, "opacity": 100,
+      "roundness": { "type": 3 }, "angle": 0
+    },
+    {
+      "id": "stack-label", "type": "text", "x": 50, "y": 812, "width": 710, "height": 34,
+      "text": "Stack: Next.js 14 (App Router) · TypeScript · Tailwind CSS · Supabase (Postgres + Auth + Realtime + Storage) · Vercel · GitHub\nCondition engine: custom keyword matcher (conditionMatcher.ts, ~150 lines, 0 API cost, 70+ conditions)  ·  No LLM used in production  ·  MIT licence, free forever",
+      "fontSize": 11, "fontFamily": 1, "textAlign": "left",
+      "strokeColor": "#374151", "backgroundColor": "transparent", "fillStyle": "solid", "angle": 0, "opacity": 100
     }
   ],
   "appState": {
