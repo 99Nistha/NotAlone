@@ -1,7 +1,18 @@
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { Heart, MessageCircle, Users, ArrowRight, PlusCircle } from "lucide-react";
+import { Heart, MessageCircle, Users, ArrowRight, PlusCircle, Pencil, Settings } from "lucide-react";
+import SignOutButton from "@/components/SignOutButton";
+
+interface DMThread {
+  otherUserId: string;
+  otherUserName: string;
+  lastMessage: string;
+  lastMessageAt: string;
+}
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -31,7 +42,23 @@ export default async function DashboardPage() {
     ? await supabase.from("groups").select("*").in("id", groupIds)
     : { data: [] };
 
-  const groups = (groupsData ?? []) as Array<{
+  // Count members live — don't trust the denormalized member_count column
+  const { data: memberCounts } = groupIds.length
+    ? await supabase
+        .from("group_members")
+        .select("group_id")
+        .in("group_id", groupIds)
+    : { data: [] };
+
+  const memberCountMap: Record<string, number> = {};
+  memberCounts?.forEach(({ group_id }) => {
+    memberCountMap[group_id] = (memberCountMap[group_id] ?? 0) + 1;
+  });
+
+  const groups = (groupsData ?? []).map((g) => ({
+    ...g,
+    member_count: memberCountMap[g.id] ?? 0,
+  })) as Array<{
     id: string;
     condition_name: string;
     member_count: number;
@@ -55,6 +82,39 @@ export default async function DashboardPage() {
     });
   }
 
+  // Get DM threads — latest message per unique conversation
+  const { data: dmMessages } = await supabase
+    .from("direct_messages")
+    .select("id, sender_id, recipient_id, content, created_at")
+    .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  // Deduplicate: keep only the latest message per conversation partner
+  const dmThreadMap: Record<string, { content: string; created_at: string; otherUserId: string }> = {};
+  dmMessages?.forEach((msg) => {
+    const otherUserId = msg.sender_id === user.id ? msg.recipient_id : msg.sender_id;
+    if (!dmThreadMap[otherUserId]) {
+      dmThreadMap[otherUserId] = { content: msg.content, created_at: msg.created_at, otherUserId };
+    }
+  });
+
+  // Fetch names of other users
+  const dmUserIds = Object.keys(dmThreadMap);
+  const { data: dmProfiles } = dmUserIds.length
+    ? await supabase.from("profiles").select("id, full_name").in("id", dmUserIds)
+    : { data: [] };
+
+  const dmProfileMap: Record<string, string> = {};
+  dmProfiles?.forEach((p) => { dmProfileMap[p.id] = p.full_name ?? "Member"; });
+
+  const dmThreads: DMThread[] = Object.values(dmThreadMap).map((t) => ({
+    otherUserId: t.otherUserId,
+    otherUserName: dmProfileMap[t.otherUserId] ?? "Member",
+    lastMessage: t.content,
+    lastMessageAt: t.created_at,
+  }));
+
   // Get user's children
   const { data: children } = await supabase
     .from("children")
@@ -66,23 +126,22 @@ export default async function DashboardPage() {
   const hasGroups = groups.length > 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#faf9ff]">
       {/* Navbar */}
       <nav className="bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <Heart className="text-blue-600" size={22} fill="currentColor" />
+          <Link href="/" className="flex items-center gap-2">
+            <Heart className="text-rose-500" size={22} fill="currentColor" />
             <span className="text-lg font-bold text-gray-900">Not Alone</span>
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <span className="text-sm text-gray-500 hidden sm:block">
               {profile?.full_name || user.email}
             </span>
-            <form action="/api/auth/signout" method="POST">
-              <button className="text-sm text-gray-500 hover:text-gray-900">
-                Sign out
-              </button>
-            </form>
+            <Link href="/settings" className="text-gray-400 hover:text-gray-700 transition-colors" title="Account settings">
+              <Settings size={18} />
+            </Link>
+            <SignOutButton />
           </div>
         </div>
       </nav>
@@ -98,9 +157,9 @@ export default async function DashboardPage() {
 
         {/* Empty state — no children yet */}
         {!hasChildren && (
-          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-8 text-center mb-8">
-            <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <PlusCircle className="text-blue-600" size={28} />
+          <div className="bg-violet-50 border border-violet-100 rounded-2xl p-8 text-center mb-8">
+            <div className="w-14 h-14 bg-violet-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <PlusCircle className="text-violet-600" size={28} />
             </div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
               Start by adding your child
@@ -110,7 +169,7 @@ export default async function DashboardPage() {
             </p>
             <Link
               href="/onboarding"
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
+              className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
             >
               Add my child <ArrowRight size={18} />
             </Link>
@@ -124,7 +183,7 @@ export default async function DashboardPage() {
               <h2 className="text-lg font-semibold text-gray-900">Your children</h2>
               <Link
                 href="/onboarding"
-                className="text-sm text-blue-600 hover:underline flex items-center gap-1"
+                className="text-sm text-violet-600 hover:underline flex items-center gap-1"
               >
                 <PlusCircle size={14} /> Add another
               </Link>
@@ -135,12 +194,23 @@ export default async function DashboardPage() {
                   key={child.id}
                   className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm"
                 >
-                  <div className="font-semibold text-gray-900 text-lg">{child.name}</div>
-                  {child.age && (
-                    <div className="text-sm text-gray-500">Age {child.age}</div>
-                  )}
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <div className="font-semibold text-gray-900 text-lg">{child.name}</div>
+                      {child.age && (
+                        <div className="text-sm text-gray-500">Age {child.age}</div>
+                      )}
+                    </div>
+                    <Link
+                      href={`/children/${child.id}/edit`}
+                      className="text-gray-400 hover:text-violet-600 transition-colors p-1 rounded-lg hover:bg-violet-50"
+                      title="Edit profile"
+                    >
+                      <Pencil size={15} />
+                    </Link>
+                  </div>
                   {child.condition_normalized && (
-                    <div className="mt-2 inline-block bg-blue-50 text-blue-700 text-xs font-medium px-3 py-1 rounded-full">
+                    <div className="mt-2 inline-block bg-violet-50 text-violet-700 text-xs font-medium px-3 py-1 rounded-full">
                       {child.condition_normalized}
                     </div>
                   )}
@@ -159,13 +229,13 @@ export default async function DashboardPage() {
                 <Link
                   key={group.id}
                   href={`/groups/${group.id}`}
-                  className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group"
+                  className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-violet-200 transition-all group"
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <div className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">
+                    <div className="font-semibold text-gray-900 group-hover:text-violet-600 transition-colors leading-tight">
                       {group.condition_name}
                     </div>
-                    <ArrowRight className="text-gray-400 group-hover:text-blue-600 transition-colors flex-shrink-0 ml-2" size={18} />
+                    <ArrowRight className="text-gray-400 group-hover:text-violet-600 transition-colors flex-shrink-0 ml-2" size={18} />
                   </div>
 
                   {/* Last message preview */}
@@ -196,12 +266,55 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        {/* Has children but no groups — shouldn't usually happen */}
+        {/* Direct Messages */}
+        {dmThreads.length > 0 && (
+          <div className="mt-10">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Direct messages</h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {dmThreads.map((thread) => (
+                <Link
+                  key={thread.otherUserId}
+                  href={`/messages/${thread.otherUserId}`}
+                  className="bg-white border border-gray-100 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-violet-200 transition-all group"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="font-semibold text-gray-900 group-hover:text-violet-600 transition-colors leading-tight">
+                      {thread.otherUserName}
+                    </div>
+                    <ArrowRight className="text-gray-400 group-hover:text-violet-600 transition-colors flex-shrink-0 ml-2" size={18} />
+                  </div>
+                  <p className="text-sm text-gray-500 mb-3 line-clamp-2">
+                    &ldquo;{thread.lastMessage}&rdquo;
+                  </p>
+                  <div className="flex justify-end">
+                    <span className="flex items-center gap-1 text-xs text-gray-400">
+                      <MessageCircle size={12} />
+                      {new Date(thread.lastMessageAt).toLocaleDateString([], { month: "short", day: "numeric" })}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Has children but no groups */}
         {hasChildren && !hasGroups && (
-          <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-6 text-center">
-            <p className="text-gray-700">
-              Your group is being set up. Try refreshing in a moment.
+          <div className="bg-violet-50 border border-violet-100 rounded-xl p-6 text-center">
+            <p className="text-gray-700 font-medium mb-1">
+              You&apos;re not part of any active group yet.
             </p>
+            <p className="text-gray-500 text-sm mb-4">
+              Edit your child&apos;s profile and save to be matched with the right families.
+            </p>
+            {children && children.length > 0 && (
+              <a
+                href={`/children/${children[0].id}/edit`}
+                className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"
+              >
+                Update child profile
+              </a>
+            )}
           </div>
         )}
       </main>

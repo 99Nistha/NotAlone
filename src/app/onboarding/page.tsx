@@ -35,6 +35,7 @@ export default function OnboardingPage() {
   const [audioSupported, setAudioSupported] = useState(true);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const liveTranscriptRef = useRef("");
+  const stoppedManuallyRef = useRef(false);
 
   // Document upload state
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -87,34 +88,57 @@ export default function OnboardingPage() {
       return;
     }
 
-    const recognition = new SpeechRecognitionAPI();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = "en-US";
-
+    stoppedManuallyRef.current = false;
     liveTranscriptRef.current = description;
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      let interim = "";
-      let final = "";
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const t = event.results[i][0].transcript;
-        if (event.results[i].isFinal) final += t + " ";
-        else interim += t;
-      }
-      if (final) liveTranscriptRef.current += final;
-      setDescription(liveTranscriptRef.current + interim);
-    };
+    function createRecognition() {
+      const recognition = new SpeechRecognitionAPI!();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
 
-    recognition.onerror = () => setIsRecording(false);
-    recognition.onend = () => setIsRecording(false);
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        let interim = "";
+        let final = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const t = event.results[i][0].transcript;
+          if (event.results[i].isFinal) final += t + " ";
+          else interim += t;
+        }
+        if (final) liveTranscriptRef.current += final;
+        setDescription(liveTranscriptRef.current + interim);
+      };
 
+      recognition.onerror = (event: Event & { error?: string }) => {
+        if (event.error === "not-allowed") {
+          stoppedManuallyRef.current = true;
+          setAudioSupported(false);
+          setIsRecording(false);
+        }
+      };
+
+      // Chrome stops recognition after silence — restart automatically
+      recognition.onend = () => {
+        if (!stoppedManuallyRef.current) {
+          const next = createRecognition();
+          next.start();
+          recognitionRef.current = next;
+        } else {
+          setIsRecording(false);
+        }
+      };
+
+      return recognition;
+    }
+
+    const recognition = createRecognition();
     recognition.start();
     recognitionRef.current = recognition;
     setIsRecording(true);
   }
 
   function stopRecording() {
+    stoppedManuallyRef.current = true;
     recognitionRef.current?.stop();
     setDescription(liveTranscriptRef.current);
     setIsRecording(false);
@@ -194,11 +218,11 @@ export default function OnboardingPage() {
   const stepIndex = ["child", "condition", "matching", "done"].indexOf(step);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-[#faf9ff] flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-lg">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
-          <Heart className="text-blue-600" size={28} fill="currentColor" />
+          <Heart className="text-rose-500" size={28} fill="currentColor" />
           <span className="text-2xl font-bold text-gray-900">Not Alone</span>
         </div>
 
@@ -208,7 +232,7 @@ export default function OnboardingPage() {
             <div
               key={i}
               className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${
-                stepIndex > i ? "bg-blue-600" : "bg-gray-200"
+                stepIndex > i ? "bg-violet-600" : "bg-gray-200"
               }`}
             />
           ))}
@@ -216,7 +240,7 @@ export default function OnboardingPage() {
 
         {/* ── Step 1: Child Info ────────────────────────────── */}
         {step === "child" && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-violet-100/60 p-8">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               Tell us about your child
             </h1>
@@ -241,7 +265,7 @@ export default function OnboardingPage() {
                   value={childForm.name}
                   onChange={(e) => setChildForm({ ...childForm, name: e.target.value })}
                   placeholder="Alex"
-                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500"
                 />
               </div>
               <div>
@@ -255,13 +279,13 @@ export default function OnboardingPage() {
                   value={childForm.age}
                   onChange={(e) => setChildForm({ ...childForm, age: e.target.value })}
                   placeholder="e.g. 7"
-                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500"
                 />
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-violet-600 hover:bg-violet-700 disabled:bg-violet-400 text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
               >
                 {loading ? "Saving…" : <>Continue <ArrowRight size={18} /></>}
               </button>
@@ -271,7 +295,7 @@ export default function OnboardingPage() {
 
         {/* ── Step 2: Condition Description ────────────────── */}
         {step === "condition" && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-violet-100/60 p-8">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               Describe {childForm.name}&apos;s condition
             </h1>
@@ -301,7 +325,7 @@ export default function OnboardingPage() {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder='e.g. "My daughter has a rare genetic condition affecting her muscles — she was diagnosed with SMA Type 2 at age 1"'
                   rows={5}
-                  className={`w-full border rounded-lg px-4 py-3 pr-14 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-gray-900 placeholder-gray-400 transition-colors ${
+                  className={`w-full border rounded-lg px-4 py-3 pr-14 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none text-gray-900 placeholder-gray-400 transition-colors ${
                     isRecording ? "border-red-400 bg-red-50" : "border-gray-200"
                   }`}
                 />
@@ -313,7 +337,7 @@ export default function OnboardingPage() {
                   className={`absolute top-3 right-3 p-2 rounded-lg transition-colors ${
                     isRecording
                       ? "bg-red-100 text-red-600 hover:bg-red-200 animate-pulse"
-                      : "bg-gray-100 text-gray-500 hover:bg-blue-100 hover:text-blue-600"
+                      : "bg-gray-100 text-gray-500 hover:bg-violet-100 hover:text-violet-600"
                   }`}
                 >
                   {isRecording ? <MicOff size={18} /> : <Mic size={18} />}
@@ -356,7 +380,7 @@ export default function OnboardingPage() {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading || !childId}
-                    className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-gray-200 hover:border-blue-400 hover:bg-blue-50 text-gray-500 hover:text-blue-600 text-sm font-medium px-4 py-3 rounded-lg transition-colors disabled:opacity-50"
+                    className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-gray-200 hover:border-violet-400 hover:bg-violet-50 text-gray-500 hover:text-violet-600 text-sm font-medium px-4 py-3 rounded-lg transition-colors disabled:opacity-50"
                   >
                     <Paperclip size={16} />
                     {uploading ? "Uploading…" : "Attach prescription or diagnosis document"}
@@ -378,7 +402,7 @@ export default function OnboardingPage() {
               <button
                 type="submit"
                 disabled={loading || !description.trim()}
-                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-violet-600 hover:bg-violet-700 disabled:bg-violet-400 text-white font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
               >
                 <Sparkles size={18} />
                 Find my community
@@ -389,10 +413,10 @@ export default function OnboardingPage() {
 
         {/* ── Step 3: Matching ──────────────────────────────── */}
         {step === "matching" && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
+          <div className="bg-white rounded-2xl shadow-sm border border-violet-100/60 p-8 text-center">
             <div className="flex justify-center mb-6">
-              <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center animate-pulse">
-                <Sparkles className="text-blue-600" size={32} />
+              <div className="w-16 h-16 bg-violet-50 rounded-full flex items-center justify-center animate-pulse">
+                <Sparkles className="text-violet-600" size={32} />
               </div>
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Finding your group…</h1>
@@ -404,12 +428,12 @@ export default function OnboardingPage() {
 
         {/* ── Step 4: Done ──────────────────────────────────── */}
         {step === "done" && matchedGroup && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
+          <div className="bg-white rounded-2xl shadow-sm border border-violet-100/60 p-8 text-center">
             {isNewGroup ? (
               <>
                 <div className="flex justify-center mb-6">
-                  <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center">
-                    <Users className="text-blue-600" size={32} />
+                  <div className="w-16 h-16 bg-violet-50 rounded-full flex items-center justify-center">
+                    <Users className="text-violet-600" size={32} />
                   </div>
                 </div>
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">
@@ -418,7 +442,7 @@ export default function OnboardingPage() {
                 <p className="text-gray-600 mb-2">
                   No group existed yet for this condition, so we created one for
                 </p>
-                <div className="bg-blue-50 text-blue-800 font-semibold text-lg px-6 py-3 rounded-xl mb-4">
+                <div className="bg-violet-50 text-violet-800 font-semibold text-lg px-6 py-3 rounded-xl mb-4">
                   {matchedCondition}
                 </div>
                 <p className="text-gray-500 text-sm mb-8">
@@ -439,7 +463,7 @@ export default function OnboardingPage() {
                 <p className="text-gray-600 mb-2">
                   {childForm.name} has been matched to the
                 </p>
-                <div className="bg-blue-50 text-blue-800 font-semibold text-lg px-6 py-3 rounded-xl mb-4">
+                <div className="bg-violet-50 text-violet-800 font-semibold text-lg px-6 py-3 rounded-xl mb-4">
                   {matchedCondition}
                 </div>
                 <p className="text-gray-500 text-sm mb-8">
@@ -457,7 +481,7 @@ export default function OnboardingPage() {
 
             <button
               onClick={() => router.push(`/groups/${matchedGroup.id}`)}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-violet-600 hover:bg-violet-700 text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
             >
               {isNewGroup ? "Start the conversation" : "Meet your group"}
               <ArrowRight size={18} />

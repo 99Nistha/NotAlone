@@ -24,6 +24,14 @@ export default async function GroupPage({
 
   if (error || !group) redirect("/dashboard");
 
+  // Live member count
+  const { count } = await supabase
+    .from("group_members")
+    .select("*", { count: "exact", head: true })
+    .eq("group_id", id);
+
+  group.member_count = count ?? 0;
+
   // Get initial messages (most recent 50, ascending so chat reads top→bottom)
   const { data: messages } = await supabase
     .from("messages")

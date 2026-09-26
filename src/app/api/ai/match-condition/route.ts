@@ -27,11 +27,11 @@ export async function POST(request: NextRequest) {
     // Normalize condition using keyword matcher (no API cost)
     const conditionName = normalizeCondition(description);
 
-    // Find existing group or create new one
+    // Find existing group or create new one (exact match on normalized name)
     const { data: existingGroups } = await supabase
       .from("groups")
       .select("*")
-      .ilike("condition_name", `%${conditionName.split(" ")[0]}%`)
+      .eq("condition_name", conditionName)
       .limit(1);
 
     let group = existingGroups?.[0];
@@ -49,13 +49,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Add user to group
-    await supabase
+    const { error: joinError } = await supabase
       .from("group_members")
       .upsert({
         user_id: user.id,
         group_id: group.id,
         child_id: childId || null,
       });
+
+    // Insert a system join message so group members see "X joined"
+    if (!joinError && !isNewGroup) {
+      await supabase.from("messages").insert({
+        group_id: group.id,
+        user_id: user.id,
+        content: "[[joined]]",
+      });
+    }
 
     // Update child with normalized condition
     if (childId) {

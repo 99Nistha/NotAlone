@@ -1,0 +1,321 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
+import { Heart, ArrowLeft, Mic, MicOff, Save, Trash2 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+
+export default function EditChildPage() {
+  const router = useRouter();
+  const { id } = useParams<{ id: string }>();
+
+  const [form, setForm] = useState({
+    name: "",
+    age: "",
+    condition_description: "",
+  });
+  const [originalCondition, setOriginalCondition] = useState("");
+  const [hasGroup, setHasGroup] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  // Audio
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioSupported, setAudioSupported] = useState(true);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const liveTranscriptRef = useRef("");
+  const stoppedManuallyRef = useRef(false);
+
+  useEffect(() => {
+    async function load() {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("children")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (data) {
+        setForm({
+          name: data.name ?? "",
+          age: data.age?.toString() ?? "",
+          condition_description: data.condition_description ?? "",
+        });
+        setOriginalCondition(data.condition_description ?? "");
+        setHasGroup(!!data.condition_normalized);
+      }
+      setLoading(false);
+    }
+    load();
+  }, [id]);
+
+  function startRecording() {
+    const SpeechRecognitionAPI =
+      (window as typeof window & { SpeechRecognition?: typeof SpeechRecognition })
+        .SpeechRecognition ||
+      (window as typeof window & { webkitSpeechRecognition?: typeof SpeechRecognition })
+        .webkitSpeechRecognition;
+
+    if (!SpeechRecognitionAPI) {
+      setAudioSupported(false);
+      return;
+    }
+
+    stoppedManuallyRef.current = false;
+    liveTranscriptRef.current = form.condition_description;
+
+    function createRecognition() {
+      const recognition = new SpeechRecognitionAPI!();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
+
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        let interim = "";
+        let final = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const t = event.results[i][0].transcript;
+          if (event.results[i].isFinal) final += t + " ";
+          else interim += t;
+        }
+        if (final) liveTranscriptRef.current += final;
+        setForm((f) => ({ ...f, condition_description: liveTranscriptRef.current + interim }));
+      };
+
+      recognition.onerror = (event: Event & { error?: string }) => {
+        if (event.error === "not-allowed") {
+          stoppedManuallyRef.current = true;
+          setAudioSupported(false);
+          setIsRecording(false);
+        }
+      };
+
+      // Chrome stops recognition after silence — restart automatically
+      recognition.onend = () => {
+        if (!stoppedManuallyRef.current) {
+          const next = createRecognition();
+          next.start();
+          recognitionRef.current = next;
+        } else {
+          setIsRecording(false);
+        }
+      };
+
+      return recognition;
+    }
+
+    const recognition = createRecognition();
+    recognition.start();
+    recognitionRef.current = recognition;
+    setIsRecording(true);
+  }
+
+  function stopRecording() {
+    stoppedManuallyRef.current = true;
+    recognitionRef.current?.stop();
+    setForm((f) => ({ ...f, condition_description: liveTranscriptRef.current }));
+    setIsRecording(false);
+  }
+
+  async function handleDelete() {
+    if (!confirm(`Remove ${form.name}'s profile? This will also remove them from their support group.`)) return;
+    setDeleting(true);
+    await fetch(`/api/children/${id}`, { method: "DELETE" });
+    router.push("/dashboard");
+    router.refresh();
+  }
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    if (isRecording) stopRecording();
+    setSaving(true);
+    setError("");
+
+    const conditionChanged = form.condition_description !== originalCondition;
+    // Also re-match if the parent has no current group (e.g. they left)
+    const shouldRematch = conditionChanged || !hasGroup;
+
+    const res = await fetch(`/api/children/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: form.name,
+        age: form.age,
+        ...(shouldRematch && form.condition_description.trim() && {
+          condition_description: form.condition_description,
+        }),
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(data.error ?? "Failed to save");
+      setSaving(false);
+      return;
+    }
+
+    setSuccess(true);
+    setSaving(false);
+
+    setTimeout(() => {
+      router.push("/dashboard");
+      router.refresh();
+    }, 1200);
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#faf9ff] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-violet-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#faf9ff] flex flex-col items-center justify-center px-4 py-12">
+      <div className="w-full max-w-lg">
+        {/* Logo */}
+        <Link href="/" className="flex items-center justify-center gap-2 mb-8">
+          <Heart className="text-rose-500" size={26} fill="currentColor" />
+          <span className="text-xl font-bold text-gray-900">Not Alone</span>
+        </Link>
+
+        <div className="bg-white rounded-2xl shadow-sm border border-violet-100/60 p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <Link href="/dashboard" className="text-gray-400 hover:text-gray-700">
+              <ArrowLeft size={20} />
+            </Link>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">Edit child profile</h1>
+              <p className="text-sm text-gray-500">Update {form.name}&apos;s details</p>
+            </div>
+          </div>
+
+          {!audioSupported && (
+            <div className="bg-yellow-50 text-yellow-800 text-sm px-4 py-3 rounded-lg mb-5">
+              Speech recognition isn&apos;t supported in this browser. Use Chrome or Edge, or type below.
+            </div>
+          )}
+
+          {error && (
+            <div className="bg-red-50 text-red-700 text-sm px-4 py-3 rounded-lg mb-5">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="bg-green-50 text-green-700 text-sm px-4 py-3 rounded-lg mb-5">
+              Saved! Redirecting to dashboard…
+            </div>
+          )}
+
+          <form onSubmit={handleSave} className="space-y-5">
+            {/* Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Child&apos;s name
+              </label>
+              <input
+                type="text"
+                required
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500 text-gray-900"
+              />
+            </div>
+
+            {/* Age */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Age <span className="text-gray-400 font-normal">(optional)</span>
+              </label>
+              <input
+                type="number"
+                min="0"
+                max="17"
+                value={form.age}
+                onChange={(e) => setForm({ ...form, age: e.target.value })}
+                className="w-full border border-gray-200 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-violet-500 text-gray-900"
+              />
+            </div>
+
+            {/* Condition */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Condition description
+              </label>
+              <p className="text-xs text-gray-400 mb-2">
+                Changing this will re-match your child to the most relevant group.
+              </p>
+              <div className="relative">
+                <textarea
+                  value={form.condition_description}
+                  onChange={(e) =>
+                    setForm({ ...form, condition_description: e.target.value })
+                  }
+                  rows={4}
+                  placeholder="Describe your child's condition…"
+                  className={`w-full border rounded-lg px-4 py-3 pr-14 focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none text-gray-900 placeholder-gray-400 transition-colors ${
+                    isRecording ? "border-red-400 bg-red-50" : "border-gray-200"
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={isRecording ? stopRecording : startRecording}
+                  title={isRecording ? "Stop recording" : "Speak"}
+                  className={`absolute top-3 right-3 p-2 rounded-lg transition-colors ${
+                    isRecording
+                      ? "bg-red-100 text-red-600 hover:bg-red-200 animate-pulse"
+                      : "bg-gray-100 text-gray-500 hover:bg-violet-100 hover:text-violet-600"
+                  }`}
+                >
+                  {isRecording ? <MicOff size={16} /> : <Mic size={16} />}
+                </button>
+              </div>
+              {isRecording && (
+                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                  Recording… speak clearly. Click mic to stop.
+                </p>
+              )}
+            </div>
+
+            <div className="flex gap-3 pt-1">
+              <Link
+                href="/dashboard"
+                className="flex-1 text-center border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium py-2.5 rounded-lg text-sm transition-colors"
+              >
+                Cancel
+              </Link>
+              <button
+                type="submit"
+                disabled={saving || success}
+                className="flex-1 bg-violet-600 hover:bg-violet-700 disabled:bg-violet-400 text-white font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+              >
+                <Save size={15} />
+                {saving ? "Saving…" : "Save changes"}
+              </button>
+            </div>
+
+            <div className="pt-4 border-t border-gray-100 mt-2">
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="w-full flex items-center justify-center gap-2 text-sm text-red-500 hover:text-red-700 hover:bg-red-50 py-2.5 rounded-lg transition-colors disabled:opacity-50"
+              >
+                <Trash2 size={14} />
+                {deleting ? "Removing…" : `Remove ${form.name}'s profile`}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}

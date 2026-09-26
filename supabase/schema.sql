@@ -81,9 +81,10 @@ ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE resources ENABLE ROW LEVEL SECURITY;
 ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
 
--- Profiles: users can only read/edit their own
-CREATE POLICY "Users can view own profile"
-  ON profiles FOR SELECT USING (auth.uid() = id);
+-- Profiles: authenticated users can read any profile (needed for DMs), only own profile editable
+DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
+CREATE POLICY "Authenticated users can view profiles"
+  ON profiles FOR SELECT USING (auth.role() = 'authenticated');
 CREATE POLICY "Users can update own profile"
   ON profiles FOR UPDATE USING (auth.uid() = id);
 CREATE POLICY "Users can insert own profile"
@@ -99,11 +100,13 @@ CREATE POLICY "Authenticated users can read groups"
 CREATE POLICY "Authenticated users can create groups"
   ON groups FOR INSERT WITH CHECK (auth.role() = 'authenticated');
 
--- Group members: read own, join any
+-- Group members: read own, join any, leave own
 CREATE POLICY "Users see own memberships"
   ON group_members FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can join groups"
   ON group_members FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can leave groups"
+  ON group_members FOR DELETE USING (auth.uid() = user_id);
 
 -- Messages: members of the group can read/write
 CREATE POLICY "Group members can read messages"
@@ -178,5 +181,44 @@ CREATE TRIGGER on_group_join
   AFTER INSERT ON group_members
   FOR EACH ROW EXECUTE FUNCTION increment_member_count();
 
--- Enable Realtime for messages table
+-- Enable Realtime for messages and group_members tables
 ALTER PUBLICATION supabase_realtime ADD TABLE messages;
+ALTER PUBLICATION supabase_realtime ADD TABLE group_members;
+
+-- ─────────────────────────────────────────────
+-- Function: decrement group member count on leave
+-- ─────────────────────────────────────────────
+CREATE OR REPLACE FUNCTION decrement_member_count()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE groups SET member_count = GREATEST(0, member_count - 1) WHERE id = OLD.group_id;
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER on_group_leave
+  AFTER DELETE ON group_members
+  FOR EACH ROW EXECUTE FUNCTION decrement_member_count();
+
+-- ─────────────────────────────────────────────
+-- Direct Messages
+-- ─────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS direct_messages (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  sender_id    UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  recipient_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  content      TEXT NOT NULL,
+  created_at   TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE direct_messages ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can read own DMs"
+  ON direct_messages FOR SELECT
+  USING (auth.uid() = sender_id OR auth.uid() = recipient_id);
+
+CREATE POLICY "Users can send DMs"
+  ON direct_messages FOR INSERT
+  WITH CHECK (auth.uid() = sender_id);
+
+ALTER PUBLICATION supabase_realtime ADD TABLE direct_messages;
