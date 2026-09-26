@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Heart, Users, MessageCircle, BookOpen, Shield, ArrowRight } from "lucide-react";
+import { Heart, Users, MessageCircle, BookOpen, Shield, ArrowRight, Mic, Send } from "lucide-react";
 
 export default function LandingPage() {
   return (
@@ -90,10 +90,11 @@ export default function LandingPage() {
               </h2>
               <ul className="space-y-3 text-gray-600">
                 {[
-                  "AI-powered matching connects you to your specific condition group",
-                  "Chat with parents who have walked the same path",
+                  "Smart matching connects you to your specific condition group instantly",
+                  "Real-time group chat with parents who have walked the same path",
+                  "Message any parent privately, one on one",
                   "Share what's worked — treatments, schools, therapists",
-                  "Always free, moderated, and safe for families",
+                  "Always free and safe for families",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3">
                     <span className="text-green-500 mt-1">✓</span>
@@ -111,19 +112,25 @@ export default function LandingPage() {
         <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
           Everything your family needs in one place
         </h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {[
             {
               icon: <Heart className="text-rose-500" size={28} />,
               bg: "bg-rose-50",
               title: "Condition Matching",
-              desc: "Describe your child's condition in plain English — our AI connects you to the right group instantly.",
+              desc: "Describe your child's condition in plain English and get matched to the right parent group instantly.",
             },
             {
               icon: <MessageCircle className="text-violet-600" size={28} />,
               bg: "bg-violet-50",
-              title: "Group Chat",
-              desc: "Real-time conversations with parents who share your exact diagnosis. Ask anything, any time.",
+              title: "Real-Time Group Chat",
+              desc: "Live conversations with parents who share your exact diagnosis. See who joins or leaves the group.",
+            },
+            {
+              icon: <Send className="text-indigo-500" size={28} />,
+              bg: "bg-indigo-50",
+              title: "Private Messaging",
+              desc: "Connect one on one with any parent in your group. Have private conversations outside the group chat.",
             },
             {
               icon: <BookOpen className="text-amber-500" size={28} />,
@@ -132,10 +139,16 @@ export default function LandingPage() {
               desc: "Crowd-sourced tips, treatments, schools, and specialists — built by families, for families.",
             },
             {
+              icon: <Mic className="text-pink-500" size={28} />,
+              bg: "bg-pink-50",
+              title: "Voice Input",
+              desc: "Describe your child's condition by speaking — just tap the mic and talk naturally.",
+            },
+            {
               icon: <Shield className="text-emerald-600" size={28} />,
               bg: "bg-emerald-50",
-              title: "Safe & Moderated",
-              desc: "Every group is moderated. Health data is encrypted. Your privacy is our priority.",
+              title: "Safe & Private",
+              desc: "Groups are condition-specific and private. Your family's health information stays protected.",
             },
           ].map((feature) => (
             <div
@@ -176,7 +189,7 @@ export default function LandingPage() {
           Ready to find your people?
         </h2>
         <p className="text-gray-600 text-lg mb-8">
-          Join thousands of families navigating the same journey together.
+          Join families navigating the same journey together.
         </p>
         <Link
           href="/register"
