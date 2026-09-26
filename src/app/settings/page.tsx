@@ -77,7 +77,7 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-lg">
-        <Link href="/dashboard" className="flex items-center justify-center gap-2 mb-8">
+        <Link href="/" className="flex items-center justify-center gap-2 mb-8">
           <Heart className="text-blue-600" size={26} fill="currentColor" />
           <span className="text-xl font-bold text-gray-900">Not Alone</span>
         </Link>

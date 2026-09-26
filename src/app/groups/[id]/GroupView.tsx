@@ -40,6 +40,7 @@ export default function GroupView({
   const [tab, setTab] = useState<Tab>("chat");
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [leavingGroup, setLeavingGroup] = useState(false);
+  const [senderPopover, setSenderPopover] = useState<{ userId: string; name: string } | null>(null);
   const [resources, setResources] = useState<Resource[]>(initialResources);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
@@ -174,8 +175,7 @@ export default function GroupView({
     if (!confirm(`Leave the ${group.condition_name} group? You can rejoin later by re-adding a child with this condition.`)) return;
     setLeavingGroup(true);
     await fetch(`/api/groups/${group.id}/leave`, { method: "DELETE" });
-    router.push("/dashboard");
-    router.refresh();
+    window.location.href = "/dashboard";
   }
 
   async function addResource(e: React.FormEvent) {
@@ -244,7 +244,7 @@ export default function GroupView({
             >
               <LogOut size={18} />
             </button>
-            <Link href="/dashboard" className="flex items-center gap-1.5">
+            <Link href="/" className="flex items-center gap-1.5">
               <Heart className="text-blue-600" size={18} fill="currentColor" />
               <span className="text-sm font-bold text-gray-900 hidden sm:block">Not Alone</span>
             </Link>
@@ -327,13 +327,12 @@ export default function GroupView({
                         <>You · {formatTime(msg.created_at)}</>
                       ) : (
                         <>
-                          <Link
-                            href={`/messages/${msg.user_id}`}
+                          <button
+                            onClick={() => setSenderPopover({ userId: msg.user_id, name: (msg.profiles as { full_name?: string })?.full_name || "Member" })}
                             className="hover:text-blue-600 hover:underline transition-colors"
-                            title="Send a private message"
                           >
                             {(msg.profiles as { full_name?: string })?.full_name || "Member"}
-                          </Link>
+                          </button>
                           {" · "}{formatTime(msg.created_at)}
                         </>
                       )}
@@ -373,6 +372,36 @@ export default function GroupView({
                 <Send size={18} />
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Sender DM popover */}
+      {senderPopover && (
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/30"
+          onClick={() => setSenderPopover(null)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-xl p-5 w-full max-w-xs mx-4 mb-4 sm:mb-0"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-sm font-semibold text-gray-900 mb-1">{senderPopover.name}</div>
+            <div className="text-xs text-gray-400 mb-4">Member of this group</div>
+            <Link
+              href={`/messages/${senderPopover.userId}`}
+              className="flex items-center gap-2 w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors justify-center"
+              onClick={() => setSenderPopover(null)}
+            >
+              <MessageCircle size={16} />
+              Message {senderPopover.name.split(" ")[0]} privately
+            </Link>
+            <button
+              className="mt-2 w-full text-sm text-gray-500 hover:text-gray-700 py-2"
+              onClick={() => setSenderPopover(null)}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}

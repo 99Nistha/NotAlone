@@ -143,7 +143,7 @@ export default function DMView({
               <div className="text-xs text-gray-400">Private message</div>
             </div>
           </div>
-          <Link href="/dashboard" className="flex items-center gap-1.5">
+          <Link href="/" className="flex items-center gap-1.5">
             <Heart className="text-blue-600" size={18} fill="currentColor" />
             <span className="text-sm font-bold text-gray-900 hidden sm:block">Not Alone</span>
           </Link>
