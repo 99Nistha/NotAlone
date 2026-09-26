@@ -108,6 +108,11 @@ export default function DMView({
         return [...prev, data.message];
       });
       setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+    } else {
+      const err = await res.json().catch(() => ({}));
+      console.error("DM send failed:", res.status, err);
+      alert(`Failed to send message: ${err.error ?? res.statusText}`);
+      setNewMessage(content); // restore the message
     }
     setSending(false);
   }
