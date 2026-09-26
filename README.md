@@ -46,7 +46,7 @@ Fill in:
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000)
+Visit https://not-alone-jade.vercel.app/
 
 ## Architecture
 
